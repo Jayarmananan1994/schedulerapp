@@ -1,30 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:schedulerapp/model/schdeule.dart';
-import 'package:schedulerapp/model/user.dart';
 
 var schdeules = [
-  Schedule(
-    color: Colors.red,
-    id: '1',
-    startTime: DateTime(2023, 10, 1, 8, 0, 0),
-    endTime: DateTime(2023, 10, 1, 9, 0, 0),
-    participants: [
-      User(id: 1, name: 'John', type: UserType.coach),
-      User(id: 2, name: 'David', type: UserType.client),
-    ],
-    meetingnote: '',
+  ScheduleItem(
+    id: 1,
+    title: 'Client Meeting',
+    startTime: DateTime.now().copyWith(hour: 9, minute: 0),
+    endTime: DateTime.now().copyWith(hour: 11, minute: 0),
+    color: Colors.green.shade200,
+    participants: List.empty(growable: true),
   ),
-  Schedule(
-    color: Colors.blue,
-    id: '2',
-    startTime: DateTime(2023, 10, 1, 10, 0, 0),
-    endTime: DateTime(2023, 10, 1, 11, 0, 0),
-    participants: [
-      User(id: 1, name: 'Reese', type: UserType.coach),
-      User(id: 2, name: 'Abdul', type: UserType.client),
-    ],
-    meetingnote: '',
+  ScheduleItem(
+    id: 2,
+    title: 'Client Meeting 2',
+    startTime: DateTime.now().copyWith(hour: 9, minute: 0),
+    endTime: DateTime.now().copyWith(hour: 10, minute: 0),
+    color: Colors.red.shade300,
+    participants: List.empty(growable: true),
   ),
 ];
 
@@ -145,7 +138,7 @@ class _TimeScrollState extends State<TimeScroll> {
     );
   }
 
-  _scheduleCard(Schedule schedule, int hour) {
+  _scheduleCard(ScheduleItem schedule, int hour) {
     bool isHourSchdeuleStart = schedule.startTime.hour == hour;
     bool isHourSchdeuleEnd = schedule.endTime.hour == hour;
     return Padding(
@@ -169,7 +162,7 @@ class _TimeScrollState extends State<TimeScroll> {
             height: _timeCardHeight,
             width: 200,
             //color: schedule.color,
-            child: Column(children: [Text(schedule.id)]),
+            child: Column(children: [Text(schedule.id.toString())]),
           ),
         ],
       ),

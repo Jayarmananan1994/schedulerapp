@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:schedulerapp/component/month_day_selector.dart';
-import 'package:schedulerapp/component/time_scroll.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -9,67 +7,38 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
-  DateTime selectedDate = DateTime.now();
+class _HomePageState extends State<HomePage>
+    with SingleTickerProviderStateMixin {
+  late TabController tabController;
+
+  @override
+  void initState() {
+    tabController = TabController(length: 3, vsync: this);
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        padding: MediaQuery.of(context).padding,
-        height: double.infinity,
-        width: double.infinity,
-        decoration: const BoxDecoration(color: Colors.black),
-        child: Column(
-          children: [
-            calendarIconRow(context),
-            MonthDaySelector(
-              selectedDay: selectedDate,
-              onDateSelected: (date) => setState(() => selectedDate = date),
-            ),
-            TimeScroll(selectedDay: selectedDate),
+      appBar: AppBar(
+        centerTitle: true,
+        bottom: TabBar(
+          controller: tabController,
+          tabs: [
+            Tab(icon: Icon(Icons.home), text: "Home"),
+            Tab(icon: Icon(Icons.verified_user), text: "Clients"),
+            Tab(icon: Icon(Icons.verified_user_outlined), text: 'Staff'),
           ],
         ),
       ),
+      body: TabBarView(
+        controller: tabController,
+        children: [
+          Text('First screen'),
+          Center(child: Text('Second screen')),
+          Center(child: Text('Third screen')),
+        ],
+      ),
     );
-  }
-
-  calendarIconRow(context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        IconButton(
-          onPressed: () => _showCalendar(context),
-          icon: Icon(Icons.calendar_today),
-        ),
-      ],
-    );
-  }
-
-  Future<void> _showCalendar(BuildContext context) async {
-    final DateTime? pickedDate = await showDatePicker(
-      context: context,
-      initialDate: selectedDate,
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
-              primary: Colors.blue, // Header color
-              onPrimary: Colors.white, // Header text color
-            ),
-          ),
-          child: child!,
-        );
-      },
-    );
-
-    if (pickedDate != null) {
-      print("Selected Date: $pickedDate");
-      setState(() {
-        selectedDate = pickedDate;
-      });
-    }
   }
 }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:schedulerapp/component/flexible_schdule_row.dart';
+import 'package:schedulerapp/component/schdeule_card.dart';
+import 'package:schedulerapp/model/schdeule.dart';
+import 'package:schedulerapp/service/storage_service.dart';
 
 class ScheduleScreen extends StatefulWidget {
   const ScheduleScreen({super.key});
@@ -9,47 +11,17 @@ class ScheduleScreen extends StatefulWidget {
   State<ScheduleScreen> createState() => _ScheduleScreenState();
 }
 
-class _ScheduleScreenState extends State<ScheduleScreen> {
-  final DateTime _selectedDay = DateTime.now();
-  bool _showCalendar = false;
+class _ScheduleScreenState extends State<ScheduleScreen>
+    with SingleTickerProviderStateMixin {
+  DateTime _selectedDay = DateTime.now();
   final double _hourHeight = 150.0;
   final ScrollController _scrollController = ScrollController();
-
-  final List<ScheduleItem> _scheduleItems = [
-    ScheduleItem(
-      title: 'Client Meeting',
-      startTime: DateTime.now().copyWith(hour: 9, minute: 0),
-      endTime: DateTime.now().copyWith(hour: 11, minute: 0),
-      color: Colors.green.shade200,
-    ),
-    ScheduleItem(
-      title: 'Client Meeting 2',
-      startTime: DateTime.now().copyWith(hour: 9, minute: 0),
-      endTime: DateTime.now().copyWith(hour: 10, minute: 0),
-      color: Colors.red.shade300,
-    ),
-    ScheduleItem(
-      title: 'Lunch Break',
-      startTime: DateTime.now().copyWith(hour: 12, minute: 0),
-      endTime: DateTime.now().copyWith(hour: 13, minute: 0),
-      color: Colors.orange.shade200,
-    ),
-    ScheduleItem(
-      title: 'Project Review',
-      startTime: DateTime.now().copyWith(hour: 14, minute: 0),
-      endTime: DateTime.now().copyWith(hour: 17, minute: 00),
-      color: Colors.purple.shade200,
-    ),
-    ScheduleItem(
-      title: 'Team Sync',
-      startTime: DateTime.now().copyWith(hour: 16, minute: 0),
-      endTime: DateTime.now().copyWith(hour: 16, minute: 45),
-      color: Colors.red.shade200,
-    ),
-  ];
+  final StorageService _storageService = StorageService();
+  late TabController tabController;
 
   @override
   void initState() {
+    tabController = TabController(length: 3, vsync: this);
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scrollToCurrentTime();
@@ -61,7 +33,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     final hour = now.hour + (now.minute / 60);
     final offset = hour * _hourHeight - MediaQuery.of(context).size.height / 3;
     _scrollController.animateTo(
-      offset.clamp(0.0, 23 * _hourHeight),
+      offset.clamp(0.0, 6 * _hourHeight),
       duration: const Duration(milliseconds: 500),
       curve: Curves.easeInOut,
     );
@@ -75,7 +47,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.calendar_today),
-            onPressed: () => setState(() => _showCalendar = !_showCalendar),
+            onPressed: _selectDate,
           ),
         ],
       ),
@@ -90,6 +62,10 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
           ),
           Expanded(child: _buildTimeLines()),
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _showAddScheduleWindow,
+        child: Icon(Icons.add),
       ),
     );
   }
@@ -107,7 +83,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
             child: Align(
-              alignment: Alignment.centerLeft,
+              alignment: Alignment.topLeft,
               child: Text(
                 '${index.toString().padLeft(2, '0')}:00',
                 style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
@@ -119,6 +95,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     });
 
     final scheduleItems = _getScheduleItemsForSelectedDay();
+    print('Schedule items length: ${scheduleItems.length}');
     scheduleItems.sort((a, b) => a.startTime.compareTo(b.startTime));
 
     return SingleChildScrollView(
@@ -128,63 +105,83 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
         child: Stack(
           children: [
             Column(children: hourLines),
-            for (final item in scheduleItems) _buildScheduleItemWidget(item),
+            ..._buildScheduleCards(scheduleItems),
           ],
         ),
       ),
     );
   }
 
-  Widget scheduleTable(scheduleItems) {
-    return ListView(
-      scrollDirection: Axis.horizontal,
-      children: [
-        for (final item in scheduleItems) _buildScheduleItemWidget(item),
-      ],
-    );
+  List<Widget> _buildScheduleCards(List<ScheduleItem> items) {
+    if (items.isEmpty) {
+      return [];
+    }
+    final deviceWidth = MediaQuery.of(context).size.width - 60;
+    List<List<ScheduleItem>> itemsSortedByTimes = [];
+    List<Widget> scheduleCards = [];
+    items.sort((a, b) => a.startTime.compareTo(b.startTime));
+    List<ScheduleItem> currentList = [items[0]];
+    itemsSortedByTimes.add(currentList);
+    print('total device width: $deviceWidth');
+    for (int i = 1; i < items.length; i++) {
+      if (currentList.first.intersects(items[i])) {
+        currentList.add(items[i]);
+      } else {
+        currentList = [items[i]];
+        itemsSortedByTimes.add(currentList);
+      }
+    }
+
+    for (var listItems in itemsSortedByTimes) {
+      double width = deviceWidth / listItems.length.toDouble();
+      double leftPadding = 0;
+      for (int i = 0; i < listItems.length; i++) {
+        scheduleCards.add(
+          _buildPositionedCardItem(listItems[i], width, leftPadding),
+        );
+        leftPadding += width;
+      }
+    }
+    return scheduleCards;
   }
 
-  Widget _buildScheduleItemWidget(ScheduleItem item) {
+  Widget _buildPositionedCardItem(
+    ScheduleItem item,
+    double width,
+    double leftPadding,
+  ) {
     final startHour = item.startTime.hour + item.startTime.minute / 60;
     final endHour = item.endTime.hour + item.endTime.minute / 60;
     final duration = endHour - startHour;
     final top = startHour * _hourHeight;
     final height = duration * _hourHeight;
-    print(
-      'Start hour: ${item.startTime.hour}:${item.startTime.minute}, End hour: ${item.endTime.hour}:${item.endTime.minute}, Duration: $duration, top: $top, height: $height',
-    );
-    print(
-      'Calculated height: $height, top: $top, duration: $duration, height: $height',
-    );
-    List<ScheduleItem> scheduleItems = [item];
     return Positioned(
       top: top,
-      left: 60,
-      right: 16,
+      left: 60 + leftPadding,
       height: height,
-      child: FlexibleSchduleRow(scheduleItems: scheduleItems),
+      child: SizedBox(width: width, child: SchdeuleCard(scheduleItem: item)),
     );
   }
 
   List<ScheduleItem> _getScheduleItemsForSelectedDay() {
-    return _scheduleItems.where((item) {
-      return item.startTime.year == _selectedDay.year &&
-          item.startTime.month == _selectedDay.month &&
-          item.startTime.day == _selectedDay.day;
-    }).toList();
+    print('Selected day: $_selectedDay');
+    return _storageService.getScheduleItems(
+      new DateTime(_selectedDay.year, _selectedDay.month, _selectedDay.day),
+    );
   }
-}
 
-class ScheduleItem {
-  final String title;
-  final DateTime startTime;
-  final DateTime endTime;
-  final Color color;
+  Future<void> _selectDate() async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedDay,
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2030),
+    );
+    if (picked != null && picked != _selectedDay) {
+      setState(() => _selectedDay = picked);
+      _scrollToCurrentTime();
+    }
+  }
 
-  ScheduleItem({
-    required this.title,
-    required this.startTime,
-    required this.endTime,
-    required this.color,
-  });
+  _showAddScheduleWindow() {}
 }

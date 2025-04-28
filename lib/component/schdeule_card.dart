@@ -2,25 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:schedulerapp/model/schdeule.dart';
 
-class FlexibleSchduleRow extends StatelessWidget {
-  final List<ScheduleItem> scheduleItems;
-  const FlexibleSchduleRow({super.key, required this.scheduleItems});
+class SchdeuleCard extends StatelessWidget {
+  final ScheduleItem scheduleItem;
+
+  const SchdeuleCard({super.key, required this.scheduleItem});
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        List<Widget> containerItems = buildSchdeuleCards(scheduleItems);
-        return Row(
-          children:
-              containerItems.map((item) => Expanded(child: item)).toList(),
-        );
-      },
-    );
-  }
-
-  List<Widget> buildSchdeuleCards(List<ScheduleItem> scheduleItems) {
-    return scheduleItems.map((item) => schdeuleCard(item)).toList();
+    return schdeuleCard(scheduleItem);
   }
 
   Widget schdeuleCard(ScheduleItem item) {

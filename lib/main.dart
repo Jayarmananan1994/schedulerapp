@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:schedulerapp/page/home_page.dart';
+import 'package:schedulerapp/page/home_page_old.dart';
 import 'package:schedulerapp/page/schedule_page.dart';
 import 'package:schedulerapp/page/schedule_screen.dart';
 
@@ -17,7 +18,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const ScheduleScreen(),
+      home: const HomePage(),
     );
   }
 }
