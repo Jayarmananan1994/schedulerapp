@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:schedulerapp/page/client_list_screen.dart';
+import 'package:schedulerapp/page/schedule_screen.dart';
+import 'package:schedulerapp/page/staff_list_screen.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -20,23 +23,16 @@ class _HomePageState extends State<HomePage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        bottom: TabBar(
-          controller: tabController,
-          tabs: [
-            Tab(icon: Icon(Icons.home), text: "Home"),
-            Tab(icon: Icon(Icons.verified_user), text: "Clients"),
-            Tab(icon: Icon(Icons.verified_user_outlined), text: 'Staff'),
-          ],
-        ),
-      ),
       body: TabBarView(
         controller: tabController,
-        children: [
-          Text('First screen'),
-          Center(child: Text('Second screen')),
-          Center(child: Text('Third screen')),
+        children: [ScheduleScreen(), StaffListScreen(), ClientListScreen()],
+      ),
+      bottomNavigationBar: TabBar(
+        controller: tabController,
+        tabs: [
+          Tab(icon: Icon(Icons.home), text: "Home"),
+          Tab(icon: Icon(Icons.group), text: 'Trainers'),
+          Tab(icon: Icon(Icons.badge), text: 'Clients'),
         ],
       ),
     );

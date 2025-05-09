@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:intl/intl.dart';
+import 'package:schedulerapp/component/add_schedule_modal.dart';
 import 'package:schedulerapp/component/schdeule_card.dart';
-import 'package:schedulerapp/model/schdeule.dart';
+import 'package:schedulerapp/model/schedule.dart';
 import 'package:schedulerapp/service/storage_service.dart';
 
 class ScheduleScreen extends StatefulWidget {
@@ -16,7 +18,7 @@ class _ScheduleScreenState extends State<ScheduleScreen>
   DateTime _selectedDay = DateTime.now();
   final double _hourHeight = 150.0;
   final ScrollController _scrollController = ScrollController();
-  final StorageService _storageService = StorageService();
+  final StorageService _storageService = GetIt.instance<StorageService>();
   late TabController tabController;
 
   @override
@@ -95,9 +97,8 @@ class _ScheduleScreenState extends State<ScheduleScreen>
     });
 
     final scheduleItems = _getScheduleItemsForSelectedDay();
-    print('Schedule items length: ${scheduleItems.length}');
     scheduleItems.sort((a, b) => a.startTime.compareTo(b.startTime));
-
+    //_getSchdeuleItems();
     return SingleChildScrollView(
       controller: _scrollController,
       child: SizedBox(
@@ -112,17 +113,22 @@ class _ScheduleScreenState extends State<ScheduleScreen>
     );
   }
 
-  List<Widget> _buildScheduleCards(List<ScheduleItem> items) {
+  List<Schedule> _getSchdeuleItems() {
+    final scheduleItems = _getScheduleItemsForSelectedDay();
+    scheduleItems.sort((a, b) => a.startTime.compareTo(b.startTime));
+    return scheduleItems;
+  }
+
+  List<Widget> _buildScheduleCards(List<Schedule> items) {
     if (items.isEmpty) {
       return [];
     }
     final deviceWidth = MediaQuery.of(context).size.width - 60;
-    List<List<ScheduleItem>> itemsSortedByTimes = [];
+    List<List<Schedule>> itemsSortedByTimes = [];
     List<Widget> scheduleCards = [];
     items.sort((a, b) => a.startTime.compareTo(b.startTime));
-    List<ScheduleItem> currentList = [items[0]];
+    List<Schedule> currentList = [items[0]];
     itemsSortedByTimes.add(currentList);
-    print('total device width: $deviceWidth');
     for (int i = 1; i < items.length; i++) {
       if (currentList.first.intersects(items[i])) {
         currentList.add(items[i]);
@@ -146,7 +152,7 @@ class _ScheduleScreenState extends State<ScheduleScreen>
   }
 
   Widget _buildPositionedCardItem(
-    ScheduleItem item,
+    Schedule item,
     double width,
     double leftPadding,
   ) {
@@ -163,10 +169,9 @@ class _ScheduleScreenState extends State<ScheduleScreen>
     );
   }
 
-  List<ScheduleItem> _getScheduleItemsForSelectedDay() {
-    print('Selected day: $_selectedDay');
+  List<Schedule> _getScheduleItemsForSelectedDay() {
     return _storageService.getScheduleItems(
-      new DateTime(_selectedDay.year, _selectedDay.month, _selectedDay.day),
+      DateTime(_selectedDay.year, _selectedDay.month, _selectedDay.day),
     );
   }
 
@@ -183,5 +188,11 @@ class _ScheduleScreenState extends State<ScheduleScreen>
     }
   }
 
-  _showAddScheduleWindow() {}
+  _showAddScheduleWindow() {
+    showModalBottomSheet(
+      isScrollControlled: true,
+      context: context,
+      builder: (context) => AddScheduleModal(defaultDateTime: _selectedDay),
+    );
+  }
 }

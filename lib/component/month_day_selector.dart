@@ -33,7 +33,6 @@ class MonthDaySelector extends StatefulWidget {
 class _MonthDaySelectorState extends State<MonthDaySelector> {
   late ScrollController _scrollController;
   final double _buttonWidth = 45.0;
-  final int _visibleItems = 7;
 
   @override
   void initState() {
@@ -46,7 +45,6 @@ class _MonthDaySelectorState extends State<MonthDaySelector> {
   void didUpdateWidget(covariant MonthDaySelector oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.selectedDay != widget.selectedDay) {
-      print("Date has been changed outside");
       _scrollToSelectedDay();
     }
   }

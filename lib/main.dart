@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:schedulerapp/page/home_page.dart';
-import 'package:schedulerapp/page/home_page_old.dart';
-import 'package:schedulerapp/page/schedule_page.dart';
-import 'package:schedulerapp/page/schedule_screen.dart';
+import 'package:schedulerapp/service_locator.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await setupServiceLocator();
   runApp(const MyApp());
 }
 
