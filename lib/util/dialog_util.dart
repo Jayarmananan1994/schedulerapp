@@ -6,7 +6,6 @@ showAppInfoDialog(
   String title,
   String content,
   String okText,
-
   bool isError,
 ) {
   return showCupertinoDialog(
@@ -25,5 +24,29 @@ showAppInfoDialog(
             ),
           ],
         ),
+  );
+}
+
+showAppConfirmationDialog(context, title, confirmationText) {
+  return showCupertinoDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return CupertinoAlertDialog(
+        title: Text(title),
+        content: Text(confirmationText),
+        actions: <CupertinoDialogAction>[
+          CupertinoDialogAction(
+            isDestructiveAction: true,
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          CupertinoDialogAction(
+            isDefaultAction: true,
+            onPressed: () => Navigator.pop(context, 'Confirm'),
+            child: const Text('Confirm'),
+          ),
+        ],
+      );
+    },
   );
 }

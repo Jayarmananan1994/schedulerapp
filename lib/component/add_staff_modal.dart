@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:schedulerapp/exception/resource_creation_exception.dart';
-import 'package:schedulerapp/model/staff.dart';
+import 'package:schedulerapp/entity/staff.dart';
 import 'package:schedulerapp/service/storage_service.dart';
 
 class AddStaffModal extends StatefulWidget {
@@ -98,6 +98,7 @@ class _AddStaffModalState extends State<AddStaffModal> {
                 keyboardType: TextInputType.number,
                 decoration: const InputDecoration(
                   labelText: 'Price per session',
+                  prefixText: '\$',
                   border: OutlineInputBorder(),
                 ),
               ),

@@ -1,15 +1,19 @@
+import 'package:flutter/material.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:path_provider/path_provider.dart' as path_provider;
 import 'package:schedulerapp/exception/schdule_conflict_exception.dart';
-import 'package:schedulerapp/model/schedule.dart';
-import 'package:schedulerapp/model/staff.dart';
-import 'package:schedulerapp/model/trainee.dart';
+import 'package:schedulerapp/entity/gym_package.dart';
+import 'package:schedulerapp/entity/schedule.dart';
+import 'package:schedulerapp/entity/staff.dart';
+import 'package:schedulerapp/entity/trainee.dart';
 import 'package:schedulerapp/service/storage_service.dart';
+import 'package:schedulerapp/util/app_util.dart';
 
 class HiveStorageService implements StorageService {
   late Box<Staff> _staffBox;
   late Box<Trainee> _traineeBox;
   late Box<Schedule> _scheduleBox;
+  late Box<GymPackage> _packageBox;
 
   @override
   Future<void> init() async {
@@ -20,9 +24,11 @@ class HiveStorageService implements StorageService {
       Hive.registerAdapter(TraineeAdapter());
       Hive.registerAdapter(StaffAdapter());
       Hive.registerAdapter(ScheduleAdapter());
+      Hive.registerAdapter(GymPackageAdapter());
       _staffBox = await Hive.openBox<Staff>('staffBox');
       _traineeBox = await Hive.openBox<Trainee>('traineeBox');
       _scheduleBox = await Hive.openBox<Schedule>('scheduleBox');
+      _packageBox = await Hive.openBox<GymPackage>('packageBox');
     }
   }
 
@@ -70,7 +76,7 @@ class HiveStorageService implements StorageService {
 
   @override
   Future<bool> saveScheduleItem(Schedule schedule) async {
-    validateTraineeAndTrainerSchedule(schedule);
+    _validateTraineeAndTrainerSchedule(schedule);
     await _scheduleBox.add(schedule);
     return Future.value(true);
   }
@@ -93,7 +99,7 @@ class HiveStorageService implements StorageService {
     return Future.value(true);
   }
 
-  void validateTraineeAndTrainerSchedule(Schedule schedule) {
+  void _validateTraineeAndTrainerSchedule(Schedule schedule) {
     var schedules =
         _scheduleBox.values.where((scheduleItem) {
           return scheduleItem.trainer.name == schedule.trainer.name &&
@@ -104,5 +110,136 @@ class HiveStorageService implements StorageService {
         'Schedule conflict! ${schedule.trainer.name} has another schedule at the same time.',
       );
     }
+  }
+
+  @override
+  List<Schedule> getTraineePastSessions(String clientId) {
+    return _scheduleBox.values
+        .where(
+          (schedule) =>
+              schedule.trainee.id == clientId &&
+              schedule.startTime.isBefore(DateTime.now()),
+        )
+        .toList();
+  }
+
+  @override
+  List<Schedule> getTraineeUpcomingSessions(String clientId) {
+    return _scheduleBox.values
+        .where(
+          (schedule) =>
+              schedule.trainee.id == clientId &&
+              (schedule.startTime.isAfter(DateTime.now())),
+        )
+        .toList();
+  }
+
+  @override
+  Future<bool> updateSchedule(Schedule schedule) async {
+    await schedule.save();
+    return Future.value(true);
+  }
+
+  @override
+  int getCountOfPastSessionsByTrainer(
+    Staff staff,
+    DateTime startOfMonth,
+    DateTime endOfMonth,
+  ) {
+    return _scheduleBox.values
+        .where(
+          (schedule) =>
+              schedule.trainer.id == staff.id &&
+              schedule.startTime.isAfter(startOfMonth) &&
+              schedule.startTime.isBefore(endOfMonth) &&
+              schedule.isLapsedSchedule(),
+        )
+        .length;
+  }
+
+  @override
+  int getCountOfPendingSessionsForTrainee(Trainee trainee) {
+    return _scheduleBox.values
+        .where(
+          (schedule) =>
+              schedule.trainee.id == trainee.id && schedule.isScheduleUnUsed(),
+        )
+        .length;
+  }
+
+  @override
+  List<TimeOfDay> fetchBookedTimeForStaffByDate(
+    Staff selectedTrainer,
+    DateTime currentSelectedDate,
+  ) {
+    return _scheduleBox.values
+        .where(
+          (schedule) =>
+              isSameDate(currentSelectedDate, schedule.startTime) &&
+              selectedTrainer == schedule.trainer,
+        )
+        .map((schedule) => TimeOfDay.fromDateTime(schedule.startTime))
+        .toList();
+  }
+
+  @override
+  Future<bool> addNewPackageToTrainee(
+    int sessionPurchased,
+    double price,
+    String id,
+  ) async {
+    await _packageBox.add(
+      GymPackage(
+        UniqueKey().toString(),
+        sessionPurchased,
+        price,
+        sessionPurchased,
+        id,
+      ),
+    );
+    return Future.value(true);
+  }
+
+  @override
+  List<GymPackage> getTraineeActivePackages(Trainee trainee) {
+    return _packageBox.values
+        .where(
+          (pck) => pck.traineeId == trainee.id && pck.noOfSessionsAvailable > 0,
+        )
+        .toList();
+  }
+
+  @override
+  Future<bool> addSchedules(List<Schedule> schedules) async {
+    await _scheduleBox.addAll(schedules);
+    return Future.value(true);
+  }
+
+  @override
+  int getScheduleCountFor(DateTime dateTime) {
+    return _scheduleBox.values
+        .where(
+          (val) =>
+              isSameDate(val.startTime, dateTime) &&
+              !val.isCancelled &&
+              !val.isForfeited,
+        )
+        .length;
+  }
+
+  @override
+  int getNoOfActiveClients() {
+    Set<String> clientIds = <String>{};
+    for (var package in _packageBox.values) {
+      if (package.noOfSessionsAvailable > 0) {
+        clientIds.add(package.traineeId);
+      }
+    }
+    return clientIds.length;
+  }
+
+  @override
+  int getNoOfTrainers() {
+    return _staffBox.length;
   }
 }

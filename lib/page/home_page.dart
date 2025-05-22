@@ -1,38 +1,47 @@
-import 'package:flutter/material.dart';
-import 'package:schedulerapp/page/client_list_screen.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:schedulerapp/page/content_page.dart';
+import 'package:schedulerapp/page/dashboard/new_dashboard_screen.dart';
+import 'package:schedulerapp/page/gym_management/gym_management_screen.dart';
+import 'package:schedulerapp/page/payroll/staff_payroll_screen.dart';
 import 'package:schedulerapp/page/schedule_screen.dart';
-import 'package:schedulerapp/page/staff_list_screen.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class HomePage extends StatelessWidget {
+  final List<Widget> tabs = [
+    NewDashboardScreen(),
+    ScheduleScreen(),
+    StaffPayrollScreen(),
+    GymManagementScreen(),
+  ];
 
-  @override
-  State<HomePage> createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage>
-    with SingleTickerProviderStateMixin {
-  late TabController tabController;
-
-  @override
-  void initState() {
-    tabController = TabController(length: 3, vsync: this);
-    super.initState();
-  }
+  HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: TabBarView(
-        controller: tabController,
-        children: [ScheduleScreen(), StaffListScreen(), ClientListScreen()],
-      ),
-      bottomNavigationBar: TabBar(
-        controller: tabController,
-        tabs: [
-          Tab(icon: Icon(Icons.home), text: "Home"),
-          Tab(icon: Icon(Icons.group), text: 'Trainers'),
-          Tab(icon: Icon(Icons.badge), text: 'Clients'),
+    return CupertinoTabScaffold(
+      tabBuilder:
+          (context, index) => CupertinoTabView(
+            builder: (context) {
+              return tabs[index];
+            },
+          ),
+      tabBar: CupertinoTabBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(CupertinoIcons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(CupertinoIcons.rectangle_grid_2x2),
+            label: 'Schedule',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(CupertinoIcons.money_dollar),
+            label: 'Payroll',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(CupertinoIcons.person_crop_circle),
+            // label: 'Gym Management',
+          ),
         ],
       ),
     );

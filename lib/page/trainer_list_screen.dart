@@ -2,17 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:schedulerapp/component/add_staff_modal.dart';
 import 'package:schedulerapp/component/staff_detail_modal.dart';
-import 'package:schedulerapp/model/staff.dart';
+import 'package:schedulerapp/entity/staff.dart';
 import 'package:schedulerapp/service/storage_service.dart';
 
-class StaffListScreen extends StatefulWidget {
-  const StaffListScreen({super.key});
+class TrainerListScreen extends StatefulWidget {
+  const TrainerListScreen({super.key});
 
   @override
-  State<StaffListScreen> createState() => _StaffListScreenState();
+  State<TrainerListScreen> createState() => _TrainerListScreenState();
 }
 
-class _StaffListScreenState extends State<StaffListScreen> {
+class _TrainerListScreenState extends State<TrainerListScreen> {
   final StorageService _storageService = GetIt.instance<StorageService>();
   @override
   Widget build(BuildContext context) {
@@ -39,6 +39,11 @@ class _StaffListScreenState extends State<StaffListScreen> {
               itemBuilder: (context, index) {
                 final staff = staffList[index];
                 return ListTile(
+                  leading: CircleAvatar(
+                    radius: 20,
+                    backgroundColor: Colors.blue,
+                    child: Text(staff.name[0], style: TextStyle(fontSize: 17)),
+                  ),
                   onTap:
                       () => showModalBottomSheet(
                         context: context,

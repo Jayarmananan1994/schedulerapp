@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:schedulerapp/model/trainee.dart';
+import 'package:schedulerapp/entity/trainee.dart';
 import 'package:schedulerapp/service/storage_service.dart';
 import 'package:schedulerapp/util/dialog_util.dart';
 
@@ -84,18 +84,29 @@ class _AddClientModalState extends State<AddClientModal> {
                 ),
               ),
               const SizedBox(height: 16.0),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: Text('Add Sessions'),
+              ),
               TextFormField(
                 controller: _priceController,
                 keyboardType: TextInputType.number,
-                validator:
-                    (value) =>
-                        (value != null &&
-                                value.isNotEmpty &&
-                                double.tryParse(value) == null)
-                            ? 'Please enter a valid fee per session'
-                            : null,
+                validator: (value) {
+                  if (_sessionsPurchased.text.isNotEmpty &&
+                      value != null &&
+                      value.isEmpty) {
+                    return 'Please fill in the Fee.';
+                  }
+                  if (value != null &&
+                      value.isNotEmpty &&
+                      double.tryParse(value) == null) {
+                    return 'Please enter a valid fee per session';
+                  }
+                  return null;
+                },
                 decoration: const InputDecoration(
                   labelText: 'Fee per session',
+                  prefixText: '\$',
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -103,16 +114,23 @@ class _AddClientModalState extends State<AddClientModal> {
               TextFormField(
                 controller: _sessionsPurchased,
                 keyboardType: TextInputType.number,
-                validator:
-                    (value) =>
-                        (value != null &&
-                                value.isNotEmpty &&
-                                int.tryParse(value) == null)
-                            ? 'Please enter a valid session count'
-                            : null,
+                validator: (value) {
+                  if (_priceController.text.isNotEmpty &&
+                      value != null &&
+                      value.isEmpty) {
+                    return 'Please fill in session count';
+                  }
+                  if (value != null &&
+                      value.isNotEmpty &&
+                      int.tryParse(value) == null) {
+                    return 'Please enter a valid session count';
+                  }
+                  return null;
+                },
                 decoration: const InputDecoration(
                   labelText: 'Sessions purchased',
                   border: OutlineInputBorder(),
+                  prefixText: 'Nos.',
                 ),
               ),
               const SizedBox(height: 32.0),
@@ -132,30 +150,39 @@ class _AddClientModalState extends State<AddClientModal> {
   }
 
   void _createNewClient() async {
-    if (_formKey.currentState != null && _formKey.currentState!.validate()) {
-      final name = _nameController.text;
-      final price = _priceController.text;
-      final sessionsPurchased = _sessionsPurchased.text;
-      if (name.isNotEmpty) {
-        final newTrainee = Trainee(
-          id: UniqueKey().toString(),
-          name: name,
-          feePerSession: price.isEmpty ? 0 : double.parse(price),
-          sessionsLeft:
-              sessionsPurchased.isEmpty ? 0 : int.parse(sessionsPurchased),
-        );
-
-        var isSaved = await _storageService.saveTrainee(newTrainee);
-
-        postSaveActivity(isSaved);
-      }
+    if (_formKey.currentState == null || !_formKey.currentState!.validate()) {
+      return;
     }
+    final name = _nameController.text;
+    final price = _priceController.text;
+    final sessionsPurchased = _sessionsPurchased.text;
+    int sessionPurchased =
+        sessionsPurchased.isEmpty ? 0 : int.parse(sessionsPurchased);
+    double fee = price.isEmpty ? 0 : double.parse(price);
+
+    final newTrainee = Trainee(
+      id: UniqueKey().toString(),
+      name: name,
+      feePerSession: fee,
+      sessionsLeft: sessionPurchased,
+    );
+
+    var isSaved = await _storageService.saveTrainee(newTrainee);
+    if (sessionPurchased > 0 && fee > 0) {
+      await _storageService.addNewPackageToTrainee(
+        sessionPurchased,
+        fee,
+        newTrainee.id,
+      );
+    }
+
+    postSaveActivity(isSaved);
   }
 
   postSaveActivity(bool isSaved) {
     String message =
         _sessionsPurchased.text == ''
-            ? 'Client added. You can adde sessions to the client later from 2nd Tab'
+            ? 'Client added. You can add sessions to the client later from 2nd Tab'
             : 'New Client added';
     if (isSaved) {
       _nameController.clear();

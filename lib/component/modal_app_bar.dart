@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:schedulerapp/constant.dart';
 
 class ModalAppBar extends StatelessWidget {
   final String title;
@@ -7,25 +9,31 @@ class ModalAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
+      color: Colors.white,
       elevation: 4,
       child: Container(
+        color: Colors.white,
         margin: const EdgeInsets.only(top: 52),
         padding: EdgeInsets.only(bottom: 10),
         width: double.infinity,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            SizedBox(width: 50),
-            const Text(
-              'Trainer Details',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: Text(
+                'Cancel',
+                style: GoogleFonts.inter(color: colorBlueTwo, fontSize: 16),
+              ),
             ),
-            IconButton(
-              icon: const Icon(Icons.close),
-              onPressed: () {
-                Navigator.pop(context, false);
-              },
+            Text(
+              title,
+              style: GoogleFonts.inter(
+                fontSize: 20,
+                fontWeight: FontWeight.w500,
+              ),
             ),
+            SizedBox(width: 70),
           ],
         ),
       ),

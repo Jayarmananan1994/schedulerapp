@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:schedulerapp/component/schedule_detail_modal.dart';
-import 'package:schedulerapp/model/schedule.dart';
+import 'package:schedulerapp/component/schedule_edit_detail_modal.dart';
+import 'package:schedulerapp/entity/schedule.dart';
 
 class SchdeuleCard extends StatelessWidget {
   final Schedule scheduleItem;
@@ -21,7 +21,7 @@ class SchdeuleCard extends StatelessWidget {
         child: Container(
           margin: const EdgeInsets.only(bottom: 4),
           decoration: BoxDecoration(
-            color: Color(item.color),
+            color: item.getColorByStatus(),
             borderRadius: BorderRadius.circular(8),
             boxShadow: [
               BoxShadow(
@@ -66,22 +66,41 @@ class SchdeuleCard extends StatelessWidget {
   }
 
   _showScheduleDetails(schedule, context) {
-    showDialog(
+    showModalBottomSheet(
       context: context,
-
-      builder:
-          (context) => AlertDialog(
-            title: const Text('Schedule Details'),
-            content: ScheduleDetailModal(schedule: schedule),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text('Close'),
-              ),
-            ],
-          ),
-      //      builder: (context) => ScheduleDetailModal(schedule: schedule),
+      isScrollControlled: true,
+      builder: (context) {
+        return ScheduleEditDetailModal(schedule: schedule);
+      },
     );
+    // showDialog(
+    //   context: context,
+
+    //   builder:
+    //       (context) => AlertDialog(
+    //         title: const Text('Schedule Details'),
+    //         content: ScheduleDetailModal(schedule: schedule),
+    //         actions: [
+    //           TextButton(
+    //             onPressed: () {
+    //               Navigator.of(context).pop();
+    //             },
+    //             child: const Text('Forfit'),
+    //           ),
+    //           TextButton(
+    //             onPressed: () {
+    //               Navigator.of(context).pop();
+    //             },
+    //             child: const Text('Cancel'),
+    //           ),
+    //           TextButton(
+    //             onPressed: () => Navigator.of(context).pop(),
+    //             child: const Text('Close'),
+    //           ),
+    //         ],
+    //       ),
+    //   //      builder: (context) => ScheduleDetailModal(schedule: schedule),
+    // );
   }
 
   avatarRow(Schedule item) {

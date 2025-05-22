@@ -57,13 +57,17 @@ class _MonthDaySelectorState extends State<MonthDaySelector> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(children: [monthTitle(), monthDaysList()]);
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [monthTitle(), monthDaysList()],
+    );
   }
 
   monthTitle() {
-    return Container(
-      height: 70,
-      padding: const EdgeInsets.only(top: 20),
+    return SizedBox(
+      height: 50,
+      //decoration: BoxDecoration(border: Border.all(color: Colors.black)),
+      //padding: const EdgeInsets.only(top: 20),
       child: Text(
         months[widget.selectedDay.month - 1],
         style: GoogleFonts.inter(
@@ -123,7 +127,13 @@ class _MonthDaySelectorState extends State<MonthDaySelector> {
                 child: Center(
                   child: Text(
                     number.toString(),
-                    style: TextStyle(color: Colors.white, fontSize: 18),
+                    style: TextStyle(
+                      color:
+                          (number == widget.selectedDay.day)
+                              ? Colors.white
+                              : Colors.black54,
+                      fontSize: 18,
+                    ),
                   ),
                 ),
               ),

@@ -22,3 +22,15 @@ const pastelColors = [
   Color(0xFF5D6B7A), // Steel blue
   Color(0xFF7A6B6D), // Dusky rose
 ];
+
+const colorblack = Color(0xFF111827);
+const colorgrey = Color(0XFF6B7280);
+const colorBlue = Color(0xff2563EB);
+const colorGreenLight = Color(0xffDCFCE7);
+const colorgreen = Color(0xff15803D);
+const colorShadowGrey = Color(0xffF9FAFB);
+const colorWarning = Color(0xffA16207);
+const colorWarningLight = Color(0xffFEFCE8);
+const colorGreyTwo = Color(0xff4B5563);
+const colorBlueTwo = Color(0xff007AFF);
+const colorgreyShadeThree = Color(0xffF3F4F6);

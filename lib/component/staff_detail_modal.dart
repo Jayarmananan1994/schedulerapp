@@ -1,8 +1,9 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:intl/intl.dart';
-import 'package:schedulerapp/model/schedule.dart';
-import 'package:schedulerapp/model/staff.dart';
+import 'package:schedulerapp/entity/schedule.dart';
+import 'package:schedulerapp/entity/staff.dart';
 import 'package:schedulerapp/service/storage_service.dart';
 
 class StaffDetailModal extends StatelessWidget {
@@ -26,8 +27,8 @@ class StaffDetailModal extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             staffDetail(staff),
-            SizedBox(height: 20),
-            options(),
+            //SizedBox(height: 20),
+            //options(),
             SizedBox(height: 30),
             upcomingSchedule(),
           ],
@@ -52,7 +53,7 @@ class StaffDetailModal extends StatelessWidget {
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             IconButton(
-              icon: const Icon(Icons.close),
+              icon: const Icon(CupertinoIcons.xmark),
               onPressed: () {
                 Navigator.pop(context, false);
               },
@@ -64,6 +65,7 @@ class StaffDetailModal extends StatelessWidget {
   }
 
   staffDetail(Staff staff) {
+    double totalCostFromStartOfMonth = computeTotalCost(staff);
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -74,11 +76,13 @@ class StaffDetailModal extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         Text(
-          'Pay Rate: \$${staff.payRate.toString()}',
+          'Pay Rate: \$${staff.payRate.toString()} / Session',
           style: const TextStyle(fontSize: 18),
         ),
-
-        Text('Total Pay: \$ 100.00', style: const TextStyle(fontSize: 18)),
+        Text(
+          'Current month\'s Earning: \$$totalCostFromStartOfMonth',
+          style: const TextStyle(fontSize: 18),
+        ),
       ],
     );
   }
@@ -105,7 +109,9 @@ class StaffDetailModal extends StatelessWidget {
               return const Center(child: Text('No upcoming schedules.'));
             } else {
               final scheduleList = snapshot.data!;
-              var dormatter = DateFormat('h:mm a');
+              scheduleList.sort((a, b) => a.startTime.compareTo(b.startTime));
+              var dateFormatter = DateFormat('d MMM y');
+              var timeFormatter = DateFormat('h:mm a');
               return ListView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
@@ -114,10 +120,14 @@ class StaffDetailModal extends StatelessWidget {
                   final schedule = scheduleList[index];
                   return ListTile(
                     title: Text(
-                      '${schedule.trainee.name}@ ${schedule.location}',
+                      'with ${schedule.trainee.name} @ ${schedule.location!.isEmpty ? 'NA' : schedule.location}',
                     ),
                     subtitle: Text(
-                      '${dormatter.format(schedule.startTime)} - ${dormatter.format(schedule.endTime)}',
+                      'on ${dateFormatter.format(schedule.startTime)}',
+                    ),
+                    trailing: Text(
+                      timeFormatter.format(schedule.startTime),
+                      style: const TextStyle(fontSize: 12),
                     ),
                   );
                 },
@@ -182,5 +192,26 @@ class StaffDetailModal extends StatelessWidget {
         Navigator.pop(context, true);
       }
     });
+  }
+
+  double computeTotalCost(Staff staff) {
+    DateTime startOfMonth = DateTime(
+      DateTime.now().year,
+      DateTime.now().month,
+      1,
+    );
+    DateTime endOfMonth = DateTime(
+      DateTime.now().year,
+      DateTime.now().month + 1,
+      0,
+    );
+
+    final noOfSchedules = _storageService.getCountOfPastSessionsByTrainer(
+      staff,
+      startOfMonth,
+      endOfMonth,
+    );
+
+    return noOfSchedules * staff.payRate;
   }
 }

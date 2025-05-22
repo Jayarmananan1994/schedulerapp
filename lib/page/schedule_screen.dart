@@ -1,9 +1,12 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:intl/intl.dart';
-import 'package:schedulerapp/component/add_schedule_modal.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:schedulerapp/constant.dart';
+import 'package:schedulerapp/modal/createschedule/create_schedule_modal.dart';
+import 'package:schedulerapp/component/month_day_selector.dart';
 import 'package:schedulerapp/component/schdeule_card.dart';
-import 'package:schedulerapp/model/schedule.dart';
+import 'package:schedulerapp/entity/schedule.dart';
 import 'package:schedulerapp/service/storage_service.dart';
 
 class ScheduleScreen extends StatefulWidget {
@@ -14,61 +17,108 @@ class ScheduleScreen extends StatefulWidget {
 }
 
 class _ScheduleScreenState extends State<ScheduleScreen>
-    with SingleTickerProviderStateMixin {
-  DateTime _selectedDay = DateTime.now();
+    with AutomaticKeepAliveClientMixin {
+  DateTime? _selectedDay;
   final double _hourHeight = 150.0;
   final ScrollController _scrollController = ScrollController();
   final StorageService _storageService = GetIt.instance<StorageService>();
-  late TabController tabController;
 
   @override
   void initState() {
-    tabController = TabController(length: 3, vsync: this);
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scrollToCurrentTime();
     });
+    _selectedDay = _selectedDay ?? DateTime.now();
   }
 
-  void _scrollToCurrentTime() {
-    final now = DateTime.now();
-    final hour = now.hour + (now.minute / 60);
-    final offset = hour * _hourHeight - MediaQuery.of(context).size.height / 3;
-    _scrollController.animateTo(
-      offset.clamp(0.0, 6 * _hourHeight),
-      duration: const Duration(milliseconds: 500),
-      curve: Curves.easeInOut,
-    );
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Schedule Manager'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.calendar_today),
-            onPressed: _selectDate,
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Text(
-              DateFormat('EEEE, MMMM d, y').format(_selectedDay),
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+    super.build(context);
+    return CupertinoPageScaffold(
+      navigationBar: CupertinoNavigationBar(
+        leading: Padding(
+          padding: const EdgeInsets.only(top: 8.0),
+          child: Text(
+            'Schedules',
+            style: GoogleFonts.inter(
+              fontWeight: FontWeight.w600,
+              fontSize: 24,
+              color: colorblack,
             ),
           ),
-          Expanded(child: _buildTimeLines()),
+        ),
+        trailing: IconButton(
+          icon: const Icon(CupertinoIcons.calendar_today, size: 24),
+          onPressed: _selectDate,
+        ),
+        border: Border(
+          bottom: BorderSide(
+            color: CupertinoColors.separator.resolveFrom(context),
+          ),
+        ),
+      ),
+      child: SafeArea(
+        bottom: true,
+        child: CustomScrollView(
+          slivers: [SliverFillRemaining(child: iosContent())],
+        ),
+      ),
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: _showAddScheduleWindow,
+      //   child: const Icon(Icons.add),
+      // ),
+    );
+  }
+
+  iosContent() {
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10.0),
+            child: MonthDaySelector(
+              selectedDay: _selectedDay ?? DateTime.now(),
+              onDateSelected: _onDateSelected,
+            ),
+          ),
+          _buildTimeLines(),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _showAddScheduleWindow,
-        child: Icon(Icons.add),
-      ),
+    );
+  }
+
+  content() {
+    return Column(
+      children: [
+        Container(
+          width: double.infinity,
+          margin: const EdgeInsets.only(top: 52),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.calendar_today),
+                onPressed: _selectDate,
+              ),
+            ],
+          ),
+        ),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10.0),
+          child: MonthDaySelector(
+            selectedDay: _selectedDay ?? DateTime.now(),
+            onDateSelected: _onDateSelected,
+          ),
+        ),
+        Expanded(child: _buildTimeLines()),
+      ],
     );
   }
 
@@ -98,7 +148,6 @@ class _ScheduleScreenState extends State<ScheduleScreen>
 
     final scheduleItems = _getScheduleItemsForSelectedDay();
     scheduleItems.sort((a, b) => a.startTime.compareTo(b.startTime));
-    //_getSchdeuleItems();
     return SingleChildScrollView(
       controller: _scrollController,
       child: SizedBox(
@@ -111,12 +160,6 @@ class _ScheduleScreenState extends State<ScheduleScreen>
         ),
       ),
     );
-  }
-
-  List<Schedule> _getSchdeuleItems() {
-    final scheduleItems = _getScheduleItemsForSelectedDay();
-    scheduleItems.sort((a, b) => a.startTime.compareTo(b.startTime));
-    return scheduleItems;
   }
 
   List<Widget> _buildScheduleCards(List<Schedule> items) {
@@ -169,13 +212,44 @@ class _ScheduleScreenState extends State<ScheduleScreen>
     );
   }
 
-  List<Schedule> _getScheduleItemsForSelectedDay() {
-    return _storageService.getScheduleItems(
-      DateTime(_selectedDay.year, _selectedDay.month, _selectedDay.day),
+  _onDateSelected(DateTime date) {
+    setState(() {
+      _selectedDay = date;
+    });
+    _scrollToCurrentTime();
+  }
+
+  void _scrollToCurrentTime() {
+    final hour = _selectedDay!.hour + (_selectedDay!.minute / 60);
+    final offset = hour * _hourHeight - MediaQuery.of(context).size.height / 3;
+    _scrollController.animateTo(
+      offset.clamp(0.0, 6 * _hourHeight),
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeInOut,
     );
   }
 
-  Future<void> _selectDate() async {
+  List<Schedule> _getScheduleItemsForSelectedDay() {
+    return _storageService.getScheduleItems(
+      DateTime(_selectedDay!.year, _selectedDay!.month, _selectedDay!.day),
+    );
+  }
+
+  _showAddScheduleWindow() {
+    showModalBottomSheet(
+      isScrollControlled: true,
+      context: context,
+      builder:
+          (context) => CreateScheduleModal(
+            defaultDateTime: _selectedDay ?? DateTime.now(),
+          ),
+    );
+  }
+
+  @override
+  bool get wantKeepAlive => true;
+
+  _selectDate() async {
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: _selectedDay,
@@ -186,13 +260,5 @@ class _ScheduleScreenState extends State<ScheduleScreen>
       setState(() => _selectedDay = picked);
       _scrollToCurrentTime();
     }
-  }
-
-  _showAddScheduleWindow() {
-    showModalBottomSheet(
-      isScrollControlled: true,
-      context: context,
-      builder: (context) => AddScheduleModal(defaultDateTime: _selectedDay),
-    );
   }
 }

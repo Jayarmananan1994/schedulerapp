@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:schedulerapp/model/schedule.dart';
+import 'package:schedulerapp/entity/schedule.dart';
 
 class ScheduleDetailModal extends StatefulWidget {
   final Schedule schedule;
@@ -11,7 +11,7 @@ class ScheduleDetailModal extends StatefulWidget {
 }
 
 class _ScheduleDetailModalState extends State<ScheduleDetailModal> {
-  DateFormat dateFormat = DateFormat('dd MMM yyyy HH:mm');
+  DateFormat dateFormat = DateFormat('dd MMM yy HH:mm');
   @override
   Widget build(BuildContext context) {
     return Column(
