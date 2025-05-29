@@ -21,13 +21,14 @@ class StaffAdapter extends TypeAdapter<Staff> {
       name: fields[1] as String,
       payRate: fields[3] as double,
       imageUrl: fields[2] as String?,
+      role: fields[4] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, Staff obj) {
     writer
-      ..writeByte(4)
+      ..writeByte(5)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -35,7 +36,9 @@ class StaffAdapter extends TypeAdapter<Staff> {
       ..writeByte(2)
       ..write(obj.imageUrl)
       ..writeByte(3)
-      ..write(obj.payRate);
+      ..write(obj.payRate)
+      ..writeByte(4)
+      ..write(obj.role);
   }
 
   @override

@@ -1,8 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:schedulerapp/component/progress_bar.dart';
 import 'package:schedulerapp/constant.dart';
 import 'package:schedulerapp/entity/staff.dart';
+import 'package:schedulerapp/modal/add_client/add_client_modal.dart';
+import 'package:schedulerapp/modal/add_staff_modal.dart';
 
 class GymManagementScreen extends StatelessWidget {
   const GymManagementScreen({super.key});
@@ -33,16 +36,19 @@ class GymManagementScreen extends StatelessWidget {
         child: CustomScrollView(
           slivers: [
             SliverFillRemaining(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // title(),
-                  // SizedBox(height: 32),
-                  stats(),
-                  SizedBox(height: 16),
-                  staffList(),
-                  SizedBox(height: 16),
-                ],
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // title(),
+                    // SizedBox(height: 32),
+                    stats(),
+                    SizedBox(height: 16),
+                    staffList(context),
+                    SizedBox(height: 16),
+                    traineeList(context),
+                  ],
+                ),
               ),
             ),
           ],
@@ -63,12 +69,15 @@ class GymManagementScreen extends StatelessWidget {
   }
 
   stats() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        _statItem(Icons.groups, 'Staff', '12', 'Active Members'),
-        _statItem(Icons.groups_2, 'Trainees', '48', 'Active Members'),
-      ],
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          _statItem(Icons.groups, 'Staff', '12', 'Active Members'),
+          _statItem(Icons.groups_2, 'Trainees', '48', 'Active Members'),
+        ],
+      ),
     );
   }
 
@@ -112,7 +121,7 @@ class GymManagementScreen extends StatelessWidget {
     );
   }
 
-  staffList() {
+  staffList(context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Column(
@@ -137,7 +146,7 @@ class GymManagementScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20), // Rounded edges,
                     ),
                   ),
-                  onPressed: () {},
+                  onPressed: () => _showAddStaffPage(context),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -162,10 +171,44 @@ class GymManagementScreen extends StatelessWidget {
     );
   }
 
+  _showAddStaffPage(BuildContext context) {
+    Navigator.of(context).push(
+      CupertinoPageRoute(
+        fullscreenDialog: true,
+        builder: (context) => AddStaffModal(),
+      ),
+    );
+  }
+
+  _showAddTraineePage(BuildContext context) {
+    Navigator.of(context).push(
+      CupertinoPageRoute(
+        fullscreenDialog: true,
+        builder: (context) => AddClientModal(),
+      ),
+    );
+  }
+
   _staffList() {
     var list = [
-      Staff(id: '12', name: 'Sarah Johnson', payRate: 40),
-      Staff(id: '13', name: 'Mike Johnson', payRate: 35),
+      Staff(
+        id: '12',
+        name: 'Sarah Johnson',
+        payRate: 40,
+        imageUrl: 'assets/images/trainer2.png',
+      ),
+      Staff(
+        id: '13',
+        name: 'Mike Johnson',
+        payRate: 35,
+        imageUrl: 'assets/images/trainer1.png',
+      ),
+      Staff(
+        id: '14',
+        name: 'Choon wei',
+        payRate: 35,
+        imageUrl: 'assets/images/trainer3.png',
+      ),
     ];
     return SizedBox(
       height: 180,
@@ -193,9 +236,12 @@ class GymManagementScreen extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       SizedBox(
-                        width: 48,
-                        height: 48,
-                        child: CircleAvatar(child: Text(staff.name[0])),
+                        width: 60,
+                        height: 60,
+                        child: CircleAvatar(
+                          radius: 24,
+                          backgroundImage: AssetImage(staff.imageUrl!),
+                        ),
                       ),
                       SizedBox(
                         width: 20,
@@ -234,5 +280,129 @@ class GymManagementScreen extends StatelessWidget {
         itemCount: list.length,
       ),
     );
+  }
+
+  traineeList(context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Trainees',
+                style: GoogleFonts.inter(
+                  color: colorblack,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              SizedBox(
+                width: 140,
+                child: TextButton(
+                  style: TextButton.styleFrom(
+                    backgroundColor: colorBlue,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                  ),
+                  onPressed: () => _showAddTraineePage(context),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.add, color: Colors.white),
+                      Text(
+                        'Add Trainee',
+                        style: GoogleFonts.inter(
+                          fontSize: 14,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 16),
+          //_staffList(),
+          ..._trainerList(),
+          //..._trainerList(),
+        ],
+      ),
+    );
+  }
+
+  _trainerList() {
+    var list = [
+      Staff(
+        id: '12',
+        name: 'Sarah Johnson',
+        payRate: 40,
+        imageUrl: 'assets/images/trainer2.png',
+      ),
+      Staff(
+        id: '13',
+        name: 'Mike Johnson',
+        payRate: 35,
+        imageUrl: 'assets/images/trainer1.png',
+      ),
+      Staff(
+        id: '14',
+        name: 'Choon wei',
+        payRate: 35,
+        imageUrl: 'assets/images/trainer3.png',
+      ),
+    ];
+    return list.map((staff) {
+      return Container(
+        width: double.infinity,
+        height: 95,
+        padding: EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+        margin: EdgeInsets.only(bottom: 10),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+          color: colorShadowGrey,
+        ),
+        child: Row(
+          children: [
+            CircleAvatar(
+              radius: 24,
+              backgroundImage: AssetImage(staff.imageUrl!),
+            ),
+            SizedBox(width: 10),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  staff.name,
+                  style: GoogleFonts.inter(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: colorblack,
+                  ),
+                ),
+                SizedBox(height: 5),
+                Text(
+                  'Trainee',
+                  style: GoogleFonts.inter(fontSize: 14, color: colorGreyTwo),
+                ),
+                SizedBox(height: 10),
+                SizedBox(
+                  width: 280,
+                  //width: double.infinity - 100,
+                  child: ProgressBar(
+                    progress: (8 / 10),
+                    borderRadius: BorderRadius.all(Radius.circular(5)),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      );
+    }).toList();
   }
 }

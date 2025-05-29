@@ -29,6 +29,7 @@ abstract class StorageService {
   );
 
   Future<bool> addNewPackageToTrainee(
+    String packageName,
     int sessionPurchased,
     double price,
     String id,
@@ -43,4 +44,6 @@ abstract class StorageService {
   int getNoOfActiveClients();
 
   int getNoOfTrainers();
+
+  List<GymPackage> getPackageList();
 }

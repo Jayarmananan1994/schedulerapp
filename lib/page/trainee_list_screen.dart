@@ -1,7 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:schedulerapp/component/add_client_modal.dart';
+import 'package:schedulerapp/modal/add_client/add_client_modal.dart';
 import 'package:schedulerapp/component/client_detail_modal.dart';
 import 'package:schedulerapp/entity/trainee.dart';
 import 'package:schedulerapp/service/storage_service.dart';

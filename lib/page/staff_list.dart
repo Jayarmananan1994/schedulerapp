@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:schedulerapp/component/add_staff_modal.dart';
+import 'package:schedulerapp/modal/add_staff_modal.dart';
 import 'package:schedulerapp/entity/staff.dart';
 import 'package:schedulerapp/service/storage_service.dart';
 

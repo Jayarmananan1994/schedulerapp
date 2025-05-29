@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:schedulerapp/page/content_page.dart';
 import 'package:schedulerapp/page/dashboard/new_dashboard_screen.dart';
 import 'package:schedulerapp/page/gym_management/gym_management_screen.dart';
 import 'package:schedulerapp/page/payroll/staff_payroll_screen.dart';

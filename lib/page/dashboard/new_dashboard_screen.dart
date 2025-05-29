@@ -165,13 +165,15 @@ class NewDashboardScreen extends StatelessWidget {
                 ],
               ),
               child: CupertinoListTile(
+                leadingSize: 48,
                 leading: CircleAvatar(
-                  radius: 20,
-                  backgroundColor: colorBlueTwo,
-                  child: Text(
-                    client[0],
-                    style: GoogleFonts.inter(fontSize: 20, color: Colors.white),
-                  ),
+                  radius: 24,
+                  backgroundImage: AssetImage('assets/images/trainee1.png'),
+                  // backgroundColor: colorBlueTwo,
+                  // child: Text(
+                  //   client[0],
+                  //   style: GoogleFonts.inter(fontSize: 20, color: Colors.white),
+                  // ),
                 ),
                 title: Padding(
                   padding: const EdgeInsets.only(top: 16.0),

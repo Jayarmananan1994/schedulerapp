@@ -114,10 +114,12 @@ class _TraineePackageManagerWidgetState
           } else {
             return SizedBox(
               width: 80.0,
-              child: InkWell(
+              child: GestureDetector(
                 onTap: _showAddSessionDialog,
                 child: Card(
-                  color: Colors.deepPurple[100],
+                  color:
+                      CupertinoColors
+                          .systemBackground, //Colors.deepPurple[100],
                   child: const Center(child: Icon(Icons.add)),
                 ),
               ),
@@ -136,6 +138,7 @@ class _TraineePackageManagerWidgetState
 
     if (result != null && result is Map<String, dynamic>) {
       await _storageService.addNewPackageToTrainee(
+        'Custom Package',
         result['sessions'],
         result['cost'],
         widget.trainee.id,

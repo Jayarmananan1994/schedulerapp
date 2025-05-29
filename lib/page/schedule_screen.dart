@@ -54,9 +54,18 @@ class _ScheduleScreenState extends State<ScheduleScreen>
             ),
           ),
         ),
-        trailing: IconButton(
-          icon: const Icon(CupertinoIcons.calendar_today, size: 24),
-          onPressed: _selectDate,
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            IconButton(
+              icon: const Icon(CupertinoIcons.ellipsis, size: 24),
+              onPressed: () => _showActionsSheet(context),
+            ),
+            // IconButton(
+            //   icon: const Icon(CupertinoIcons.calendar_today, size: 24),
+            //   onPressed: _selectDate,
+            // ),
+          ],
         ),
         border: Border(
           bottom: BorderSide(
@@ -67,7 +76,18 @@ class _ScheduleScreenState extends State<ScheduleScreen>
       child: SafeArea(
         bottom: true,
         child: CustomScrollView(
-          slivers: [SliverFillRemaining(child: iosContent())],
+          slivers: [
+            SliverToBoxAdapter(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                child: MonthDaySelector(
+                  selectedDay: _selectedDay ?? DateTime.now(),
+                  onDateSelected: _onDateSelected,
+                ),
+              ),
+            ),
+            SliverFillRemaining(child: iosContent()),
+          ],
         ),
       ),
       // floatingActionButton: FloatingActionButton(
@@ -78,20 +98,7 @@ class _ScheduleScreenState extends State<ScheduleScreen>
   }
 
   iosContent() {
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10.0),
-            child: MonthDaySelector(
-              selectedDay: _selectedDay ?? DateTime.now(),
-              onDateSelected: _onDateSelected,
-            ),
-          ),
-          _buildTimeLines(),
-        ],
-      ),
-    );
+    return SingleChildScrollView(child: _buildTimeLines());
   }
 
   content() {
@@ -236,13 +243,22 @@ class _ScheduleScreenState extends State<ScheduleScreen>
   }
 
   _showAddScheduleWindow() {
-    showModalBottomSheet(
-      isScrollControlled: true,
-      context: context,
-      builder:
-          (context) => CreateScheduleModal(
-            defaultDateTime: _selectedDay ?? DateTime.now(),
-          ),
+    // showModalBottomSheet(
+    //   isScrollControlled: true,
+    //   context: context,
+    //   builder:
+    //       (context) => CreateScheduleModal(
+    //         defaultDateTime: _selectedDay ?? DateTime.now(),
+    //       ),
+    // );
+    Navigator.of(context).push(
+      CupertinoPageRoute(
+        fullscreenDialog: true, // This is the key!
+        builder:
+            (BuildContext context) => CreateScheduleModal(
+              defaultDateTime: _selectedDay ?? DateTime.now(),
+            ),
+      ),
     );
   }
 
@@ -250,15 +266,89 @@ class _ScheduleScreenState extends State<ScheduleScreen>
   bool get wantKeepAlive => true;
 
   _selectDate() async {
-    final DateTime? picked = await showDatePicker(
+    final DateTime? picked = await showCupertinoModalPopup<DateTime?>(
       context: context,
-      initialDate: _selectedDay,
-      firstDate: DateTime(2020),
-      lastDate: DateTime(2030),
+      builder: (builderContext) {
+        DateTime selectedDate = DateTime.now();
+        return Container(
+          height: MediaQuery.of(builderContext).copyWith().size.height / 3,
+          color: CupertinoColors.systemBackground.resolveFrom(builderContext),
+          child: Column(
+            children: <Widget>[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  CupertinoButton(
+                    child: const Text('Cancel'),
+                    onPressed: () => Navigator.pop(builderContext, null),
+                  ),
+                  CupertinoButton(
+                    child: const Text('Done'),
+                    onPressed:
+                        () => Navigator.pop(builderContext, selectedDate),
+                  ),
+                ],
+              ),
+              Expanded(
+                child: CupertinoDatePicker(
+                  mode: CupertinoDatePickerMode.date, // Only show date
+                  initialDateTime: selectedDate,
+                  onDateTimeChanged: (DateTime newDateTime) {
+                    setState(() => selectedDate = newDateTime);
+                  },
+                  minimumDate: DateTime(2020),
+                  maximumDate: DateTime(2030),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
     if (picked != null && picked != _selectedDay) {
       setState(() => _selectedDay = picked);
       _scrollToCurrentTime();
     }
+  }
+
+  _showActionsSheet(context) {
+    showCupertinoModalPopup<String>(
+      context: context,
+      builder:
+          (sheetContext) => CupertinoActionSheet(
+            title: const Text('Choose an Action'),
+            message: const Text('Select an operation for your schedules:'),
+            actions: <CupertinoActionSheetAction>[
+              CupertinoActionSheetAction(
+                onPressed: () {
+                  Navigator.pop(sheetContext);
+                  _showAddScheduleWindow();
+                },
+                isDefaultAction: true,
+                child: const Text('Add New Schedule'),
+              ),
+              CupertinoActionSheetAction(
+                child: const Text('Filter Schedules'),
+                onPressed: () {
+                  Navigator.pop(sheetContext, 'Filter Schedules');
+                },
+              ),
+            ],
+            cancelButton: CupertinoActionSheetAction(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.pop(
+                  sheetContext,
+                  'Cancel',
+                ); // Dismiss without performing action
+              },
+            ),
+          ),
+    ).then((String? value) {
+      if (value != null) {
+        if (value == 'Add New Schedule') {
+        } else if (value == 'Delete All Schedules') {}
+      } else {}
+    });
   }
 }

@@ -24,6 +24,7 @@ const pastelColors = [
 ];
 
 const colorblack = Color(0xFF111827);
+const colorBlackTwo = Color(0xFF1C1C1E);
 const colorgrey = Color(0XFF6B7280);
 const colorBlue = Color(0xff2563EB);
 const colorGreenLight = Color(0xffDCFCE7);
@@ -34,3 +35,14 @@ const colorWarningLight = Color(0xffFEFCE8);
 const colorGreyTwo = Color(0xff4B5563);
 const colorBlueTwo = Color(0xff007AFF);
 const colorgreyShadeThree = Color(0xffF3F4F6);
+const coloGreyShadeFour = Color(0xffF2F2F7);
+const colorGreyShadeFive = Color(0xffF5F5F5);
+
+const trainerAvatarImageUrls = [
+  'assets/images/trainer1.png',
+  'assets/images/trainer2.png',
+  'assets/images/trainer3.png',
+  'assets/images/trainer4.png',
+  'assets/images/trainer5.png',
+  'assets/images/trainer6.png',
+];

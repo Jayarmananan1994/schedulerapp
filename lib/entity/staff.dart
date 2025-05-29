@@ -12,17 +12,20 @@ class Staff extends HiveObject {
   final String? imageUrl;
   @HiveField(3)
   final double payRate;
+  @HiveField(4)
+  final String? role;
 
   Staff({
     required this.id,
     required this.name,
     required this.payRate,
     this.imageUrl,
+    this.role,
   });
 
   @override
   String toString() {
-    return 'Staff(id: $id, name: $name, imageUrl: $imageUrl, payRate: $payRate)';
+    return 'Staff(id: $id, name: $name, imageUrl: $imageUrl, payRate: $payRate, role: $role)';
   }
 
   @override

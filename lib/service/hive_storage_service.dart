@@ -184,6 +184,7 @@ class HiveStorageService implements StorageService {
 
   @override
   Future<bool> addNewPackageToTrainee(
+    String packageName,
     int sessionPurchased,
     double price,
     String id,
@@ -191,6 +192,7 @@ class HiveStorageService implements StorageService {
     await _packageBox.add(
       GymPackage(
         UniqueKey().toString(),
+        packageName,
         sessionPurchased,
         price,
         sessionPurchased,
@@ -241,5 +243,17 @@ class HiveStorageService implements StorageService {
   @override
   int getNoOfTrainers() {
     return _staffBox.length;
+  }
+
+  @override
+  List<GymPackage> getPackageList() {
+    return [
+      GymPackage(UniqueKey().toString(), 'Yoga', 10, 100.0, 10, ''),
+      GymPackage(UniqueKey().toString(), 'Personal Training', 5, 200.0, 5, ''),
+      GymPackage(UniqueKey().toString(), 'Group Class', 20, 50.0, 20, ''),
+      GymPackage(UniqueKey().toString(), 'HIIT', 15, 150.0, 15, ''),
+      GymPackage(UniqueKey().toString(), 'Cardio', 12, 120.0, 12, ''),
+    ];
+    //return ['Yoga', 'Personal Training', 'Group Class', 'HIIT', 'Cardio'];
   }
 }

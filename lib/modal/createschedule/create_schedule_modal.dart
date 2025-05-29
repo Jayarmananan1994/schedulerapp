@@ -4,7 +4,6 @@ import 'package:get_it/get_it.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:schedulerapp/component/date_time_selector.dart';
-import 'package:schedulerapp/component/modal_app_bar.dart';
 import 'package:schedulerapp/component/trainee_package_manager_widget.dart';
 import 'package:schedulerapp/constant.dart';
 import 'package:schedulerapp/entity/gym_package.dart';
@@ -30,7 +29,7 @@ class _CreateScheduleModalState extends State<CreateScheduleModal> {
   GymPackage? selectedPackage;
   DateFormat dateFormat = DateFormat('yyyy-MM-dd');
   DateFormat timeFormat = DateFormat('hh:mm a');
-  final _formKey = GlobalKey<FormState>();
+  //  final _formKey = GlobalKey<FormState>();
   final StorageService _storageService = GetIt.I<StorageService>();
   final TextEditingController _locationController = TextEditingController();
   final TextEditingController _durationController = TextEditingController(
@@ -55,10 +54,70 @@ class _CreateScheduleModalState extends State<CreateScheduleModal> {
 
   @override
   Widget build(BuildContext context) {
+    // return Container(
+    //   color: Colors.white,
+    //   child: Column(
+    //     children: [ModalAppBar(title: 'Create Schedule'), addSchdeuleContent()],
+    //   ),
+    // );
+    return CupertinoPageScaffold(
+      navigationBar: CupertinoNavigationBar(
+        leading: CupertinoButton(
+          padding: EdgeInsets.zero,
+          onPressed: () => Navigator.pop(context),
+          child: Text('Done'),
+        ),
+        middle: Text(
+          'Create Schedule',
+          style: GoogleFonts.inter(fontSize: 20, fontWeight: FontWeight.w500),
+        ),
+      ),
+      child: SafeArea(
+        child: CustomScrollView(
+          slivers: [
+            SliverFillRemaining(
+              hasScrollBody: false,
+              child: addSchdeuleContentIos(),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  addSchdeuleContentIos() {
     return Container(
       color: Colors.white,
+      width: double.infinity,
+      padding: EdgeInsets.symmetric(horizontal: 16.0),
       child: Column(
-        children: [ModalAppBar(title: 'Create Schedule'), addSchdeuleContent()],
+        mainAxisSize: MainAxisSize.max,
+        children: [
+          traineeDropDown(),
+          SizedBox(height: 16),
+          selectedTrainee != null
+              ? TraineePackageManagerWidget(
+                trainee: selectedTrainee!,
+                onPackageSelect: (val) => selectedPackage = val,
+              )
+              : Container(),
+          SizedBox(height: selectedTrainee != null ? 16 : 0),
+          trainerDropDown(),
+          SizedBox(height: 16),
+          selectedTrainer != null
+              ? DateTimeSelector(
+                trainer: selectedTrainer!,
+                onDateSelected: (datesSelected) {
+                  selectedDates = datesSelected;
+                },
+              )
+              : Container(),
+          SizedBox(height: selectedTrainer != null ? 16 : 0),
+          locationTextField(),
+          SizedBox(height: 32),
+          saveButton(),
+          SizedBox(height: 40),
+        ],
       ),
     );
   }
@@ -70,37 +129,34 @@ class _CreateScheduleModalState extends State<CreateScheduleModal> {
           color: Colors.white,
           width: double.infinity,
           padding: EdgeInsets.symmetric(horizontal: 16.0),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                traineeDropDown(),
-                SizedBox(height: 16),
-                selectedTrainee != null
-                    ? TraineePackageManagerWidget(
-                      trainee: selectedTrainee!,
-                      onPackageSelect: (val) => selectedPackage = val,
-                    )
-                    : Container(),
-                SizedBox(height: selectedTrainee != null ? 16 : 0),
-                trainerDropDown(),
-                SizedBox(height: 16),
-                selectedTrainer != null
-                    ? DateTimeSelector(
-                      trainer: selectedTrainer!,
-                      onDateSelected: (datesSelected) {
-                        selectedDates = datesSelected;
-                      },
-                    )
-                    : Container(),
-                SizedBox(height: selectedTrainer != null ? 16 : 0),
-                locationTextField(),
-                SizedBox(height: 32),
-                saveButton(),
-                SizedBox(height: 40),
-              ],
-            ),
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              traineeDropDown(),
+              SizedBox(height: 16),
+              selectedTrainee != null
+                  ? TraineePackageManagerWidget(
+                    trainee: selectedTrainee!,
+                    onPackageSelect: (val) => selectedPackage = val,
+                  )
+                  : Container(),
+              SizedBox(height: selectedTrainee != null ? 16 : 0),
+              trainerDropDown(),
+              SizedBox(height: 16),
+              selectedTrainer != null
+                  ? DateTimeSelector(
+                    trainer: selectedTrainer!,
+                    onDateSelected: (datesSelected) {
+                      selectedDates = datesSelected;
+                    },
+                  )
+                  : Container(),
+              SizedBox(height: selectedTrainer != null ? 16 : 0),
+              locationTextField(),
+              SizedBox(height: 32),
+              saveButton(),
+              SizedBox(height: 40),
+            ],
           ),
         ),
       ),
@@ -189,20 +245,20 @@ class _CreateScheduleModalState extends State<CreateScheduleModal> {
             fontSize: 16,
           ),
         ),
-        SizedBox(height: 16),
-        TextFormField(
-          decoration: InputDecoration(
-            prefixIcon: const Icon(Icons.search, color: colorgrey),
-            hintText: 'Search Trainee',
-            fillColor: colorgreyShadeThree,
-            filled: true,
-            contentPadding: const EdgeInsets.symmetric(vertical: 10.0),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(15.0),
-              borderSide: BorderSide.none,
-            ),
-          ),
-        ),
+        //SizedBox(height: 16),
+        // TextFormField(
+        //   decoration: InputDecoration(
+        //     prefixIcon: const Icon(Icons.search, color: colorgrey),
+        //     hintText: 'Search Trainee',
+        //     fillColor: colorgreyShadeThree,
+        //     filled: true,
+        //     contentPadding: const EdgeInsets.symmetric(vertical: 10.0),
+        //     border: OutlineInputBorder(
+        //       borderRadius: BorderRadius.circular(15.0),
+        //       borderSide: BorderSide.none,
+        //     ),
+        //   ),
+        // ),
         SizedBox(height: 16),
         FutureBuilder<List<Trainee>>(
           future: _traineeListFuture,
@@ -421,15 +477,15 @@ class _CreateScheduleModalState extends State<CreateScheduleModal> {
           ),
         ),
         SizedBox(height: 10),
-        TextFormField(
+        CupertinoTextFormFieldRow(
           controller: _locationController,
-          decoration: InputDecoration(
-            prefixIcon: Icon(Icons.location_on_outlined),
-            labelText: 'Enter Location',
-            border: OutlineInputBorder(
-              borderSide: BorderSide(color: Color(0xff9CA3AF)),
-            ),
-          ),
+          // decoration: InputDecoration(
+          //   prefixIcon: Icon(Icons.location_on_outlined),
+          //   labelText: 'Enter Location',
+          //   border: OutlineInputBorder(
+          //     borderSide: BorderSide(color: Color(0xff9CA3AF)),
+          //   ),
+          // ),
         ),
       ],
     );
@@ -474,9 +530,6 @@ class _CreateScheduleModalState extends State<CreateScheduleModal> {
   }
 
   void _saveSchedule() async {
-    if (_formKey.currentState == null || !_formKey.currentState!.validate()) {
-      return;
-    }
     if (selectedTrainee == null) {
       showAppInfoDialog(context, 'Error', 'Please select Trainee', 'Ok', true);
       return;
@@ -510,8 +563,7 @@ class _CreateScheduleModalState extends State<CreateScheduleModal> {
       return;
     }
 
-    if (_formKey.currentState!.validate() &&
-        selectedTrainee != null &&
+    if (selectedTrainee != null &&
         selectedTrainer != null &&
         selectedDates.isNotEmpty &&
         selectedPackage != null) {

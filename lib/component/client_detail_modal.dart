@@ -183,6 +183,7 @@ class _ClientDetailModalState extends State<ClientDetailModal>
 
     if (result != null && result is Map<String, dynamic>) {
       await _storageService.addNewPackageToTrainee(
+        'Custom Package',
         result['sessions'],
         result['cost'],
         widget.trainee.id,

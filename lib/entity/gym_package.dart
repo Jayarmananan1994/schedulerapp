@@ -7,16 +7,19 @@ class GymPackage extends HiveObject {
   @HiveField(0)
   final String id;
   @HiveField(1)
-  final int noOfSessions;
+  final String name;
   @HiveField(2)
-  final double cost;
+  final int noOfSessions;
   @HiveField(3)
-  int noOfSessionsAvailable;
+  final double cost;
   @HiveField(4)
+  int noOfSessionsAvailable;
+  @HiveField(5)
   String traineeId;
 
   GymPackage(
     this.id,
+    this.name,
     this.noOfSessions,
     this.cost,
     this.noOfSessionsAvailable,

@@ -10,7 +10,7 @@ class PayrollDetailWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+      padding: EdgeInsets.fromLTRB(16, 16, 24, 8),
       decoration: BoxDecoration(
         border: Border(top: BorderSide(color: colorShadowGrey, width: 2)),
       ),
@@ -81,12 +81,14 @@ class PayrollDetailWidget extends StatelessWidget {
           width: 63,
           height: 24,
           color: colorWarningLight,
-          child: Text(
-            'Pending',
-            style: GoogleFonts.inter(
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-              color: colorWarning,
+          child: Center(
+            child: Text(
+              'Pending',
+              style: GoogleFonts.inter(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: colorWarning,
+              ),
             ),
           ),
         ),

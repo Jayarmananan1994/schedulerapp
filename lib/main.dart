@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:schedulerapp/page/home_page.dart';
 import 'package:schedulerapp/service_locator.dart';
 
@@ -17,9 +16,7 @@ class MyApp extends StatelessWidget {
     return CupertinoApp(
       title: 'Scheduler App',
       debugShowCheckedModeBanner: false,
-      theme: CupertinoThemeData(
-        brightness: Brightness.light,
-      ),
+      theme: CupertinoThemeData(brightness: Brightness.light),
       home: HomePage(),
     );
   }
