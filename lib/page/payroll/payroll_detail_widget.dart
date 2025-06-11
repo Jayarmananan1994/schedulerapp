@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
+import 'package:schedulerapp/component/gogym_avatar.dart';
 import 'package:schedulerapp/constant.dart';
-import 'package:schedulerapp/entity/staff_payroll.dart';
+import 'package:schedulerapp/dto/staff_payroll.dart';
 
 class PayrollDetailWidget extends StatelessWidget {
   final StaffPayroll staffPayroll;
-  const PayrollDetailWidget({super.key, required this.staffPayroll});
+  final DateFormat dateFormat = DateFormat('MMM yy');
+  PayrollDetailWidget({super.key, required this.staffPayroll});
 
   @override
   Widget build(BuildContext context) {
@@ -27,9 +30,9 @@ class PayrollDetailWidget extends StatelessWidget {
     return SizedBox(
       width: 48,
       height: 48,
-      child: CircleAvatar(
-        backgroundColor: colorBlue,
-        child: Text('S', style: GoogleFonts.inter(color: Colors.white)),
+      child: GoGymAvatar(
+        imageUrl: staffPayroll.staff.imageUrl,
+        text: staffPayroll.staff.name[0].toUpperCase(),
       ),
     );
   }
@@ -72,7 +75,7 @@ class PayrollDetailWidget extends StatelessWidget {
               ),
             ),
             Text(
-              'Lead Trainer',
+              staffPayroll.staff.role ?? 'Instructor',
               style: GoogleFonts.inter(fontSize: 14, color: colorgrey),
             ),
           ],
@@ -80,14 +83,26 @@ class PayrollDetailWidget extends StatelessWidget {
         Container(
           width: 63,
           height: 24,
-          color: colorWarningLight,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(4),
+            boxShadow: [
+              BoxShadow(
+                color:
+                    staffPayroll.dueAmount > 0
+                        ? colorWarningLight
+                        : colorGreenShadow,
+                blurRadius: 4,
+                offset: Offset(0, 2),
+              ),
+            ],
+          ),
           child: Center(
             child: Text(
-              'Pending',
+              staffPayroll.dueAmount > 0 ? 'Pending' : 'No Due',
               style: GoogleFonts.inter(
                 fontSize: 12,
                 fontWeight: FontWeight.w500,
-                color: colorWarning,
+                color: staffPayroll.dueAmount > 0 ? colorWarning : colorgreen,
               ),
             ),
           ),
@@ -245,63 +260,49 @@ class PayrollDetailWidget extends StatelessWidget {
   }
 
   _upcomingSessions() {
-    return [
-      Padding(
-        padding: const EdgeInsets.only(bottom: 8.0),
-        child: Row(
-          //mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          mainAxisSize: MainAxisSize.max,
-          children: [
-            Icon(Icons.calendar_month_outlined, color: colorGreyTwo),
-            SizedBox(width: 5),
-            Text(
-              'July 15',
-              style: GoogleFonts.inter(color: colorGreyTwo, fontSize: 14),
-            ),
-            SizedBox(width: 15),
-            Icon(Icons.schedule_outlined, color: colorGreyTwo),
-            SizedBox(width: 5),
-            Text(
-              '03:00 AM',
-              style: GoogleFonts.inter(color: colorGreyTwo, fontSize: 14),
-            ),
-            SizedBox(width: 15),
-            Text(
-              '-  Tom R.',
-              style: GoogleFonts.inter(color: colorGreyTwo, fontSize: 14),
-            ),
-            SizedBox(width: 16),
-          ],
+    if (staffPayroll.upcomingSchedules.isEmpty) {
+      return [
+        Padding(
+          padding: const EdgeInsets.only(bottom: 8.0),
+          child: Text(
+            'No upcoming sessions',
+            style: GoogleFonts.inter(color: colorGreyTwo, fontSize: 14),
+          ),
         ),
-      ),
-      Padding(
-        padding: const EdgeInsets.only(bottom: 8.0),
-        child: Row(
-          mainAxisSize: MainAxisSize.max,
-          children: [
-            Icon(Icons.calendar_month_outlined, color: colorGreyTwo),
-            SizedBox(width: 5),
-            Text(
-              'July 15',
-              style: GoogleFonts.inter(color: colorGreyTwo, fontSize: 14),
+      ];
+    }
+
+    return staffPayroll.upcomingSchedules
+        .map(
+          (schedule) => Padding(
+            padding: const EdgeInsets.only(bottom: 8.0),
+            child: Row(
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                Icon(Icons.calendar_month_outlined, color: colorGreyTwo),
+                SizedBox(width: 5),
+                Text(
+                  dateFormat.format(schedule.startTime),
+                  style: GoogleFonts.inter(color: colorGreyTwo, fontSize: 14),
+                ),
+                SizedBox(width: 15),
+                Icon(Icons.schedule_outlined, color: colorGreyTwo),
+                SizedBox(width: 5),
+                Text(
+                  '03:00 AM',
+                  style: GoogleFonts.inter(color: colorGreyTwo, fontSize: 14),
+                ),
+                SizedBox(width: 15),
+                Text(
+                  '-  ${schedule.trainee.name}',
+                  style: GoogleFonts.inter(color: colorGreyTwo, fontSize: 14),
+                ),
+                SizedBox(width: 16),
+              ],
             ),
-            SizedBox(width: 15),
-            Icon(Icons.schedule_outlined, color: colorGreyTwo),
-            SizedBox(width: 5),
-            Text(
-              '10:00 AM',
-              style: GoogleFonts.inter(color: colorGreyTwo, fontSize: 14),
-            ),
-            SizedBox(width: 15),
-            Text(
-              '-  Sarah P.',
-              style: GoogleFonts.inter(color: colorGreyTwo, fontSize: 14),
-            ),
-            SizedBox(width: 16),
-          ],
-        ),
-      ),
-    ];
+          ),
+        )
+        .toList();
   }
 
   viewHistoryButton() {
@@ -310,10 +311,8 @@ class PayrollDetailWidget extends StatelessWidget {
       child: ElevatedButton(
         onPressed: () {},
         style: ElevatedButton.styleFrom(
-          //padding: const EdgeInsets.symmetric(vertical: 12),
           shadowColor: Colors.transparent,
           backgroundColor: colorShadowGrey,
-          //foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
         child: Text(

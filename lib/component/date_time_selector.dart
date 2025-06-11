@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:schedulerapp/component/hourly_grid.dart';
+import 'package:schedulerapp/constant.dart';
 import 'package:schedulerapp/entity/staff.dart';
 import 'package:schedulerapp/service/storage_service.dart';
 import 'package:schedulerapp/util/app_util.dart';
@@ -28,7 +30,21 @@ class _DateTimeSelectorState extends State<DateTimeSelector> {
   @override
   Widget build(BuildContext context) {
     return Column(
-      children: [dateScroll(), SizedBox(height: 8), timeSlotScroll()],
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Select Date',
+          style: GoogleFonts.inter(
+            color: colorBlackShadeFour,
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        SizedBox(height: 12),
+        dateScroll(),
+        SizedBox(height: 24),
+        timeSlotScroll(),
+      ],
     );
   }
 
@@ -70,48 +86,44 @@ class _DateTimeSelectorState extends State<DateTimeSelector> {
         setState(() {});
       },
       child: Container(
-        width: 80,
-        margin: EdgeInsets.symmetric(horizontal: 4),
+        width: 70,
+        height: 90,
+        margin: EdgeInsets.only(right: 12),
         decoration: BoxDecoration(
           color:
               isCurrentSelectedDate
-                  ? Colors.deepPurple[500]
+                  ? colorBlueDark
                   : isOneOfSelectedDate
                   ? Color(0xffEFF6FF)
-                  : Colors.white,
-          borderRadius: BorderRadius.circular(8),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.3),
-              spreadRadius: 1,
-              blurRadius: 3,
-            ),
-          ],
+                  : colorShadowGrey,
+          borderRadius: BorderRadius.circular(12),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
               DateFormat('EEE').format(date),
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: isCurrentSelectedDate ? Colors.white54 : Colors.black,
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: isCurrentSelectedDate ? Colors.white : Colors.black,
               ),
             ),
             SizedBox(height: 4),
             Text(
-              date.day.toString(), // Date
-              style: TextStyle(
-                fontSize: 20,
-                color: isCurrentSelectedDate ? Colors.white54 : Colors.black,
+              date.day.toString(),
+              style: GoogleFonts.inter(
+                fontSize: 18,
+                color: isCurrentSelectedDate ? Colors.white : Colors.black,
                 fontWeight: FontWeight.bold,
               ),
             ),
             SizedBox(height: 4),
             Text(
               DateFormat('MMM').format(date),
-              style: TextStyle(
-                color: isOneOfSelectedDate ? Colors.grey[900] : Colors.grey,
+              style: GoogleFonts.inter(
+                fontSize: 12,
+                color: isCurrentSelectedDate ? Colors.white : Colors.grey,
               ),
             ),
           ],
@@ -131,10 +143,24 @@ class _DateTimeSelectorState extends State<DateTimeSelector> {
 
   timeSlotScroll() {
     return _currentSelectedDate != null
-        ? HourlyGrid(
-          onSelect: _onTimeslotValueChange,
-          unavailable: _timeSlotsToExlude(),
-          initialSelected: _timeSelectedOfDate(_currentSelectedDate),
+        ? Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Select Time Slot',
+              style: GoogleFonts.inter(
+                color: colorBlackShadeFour,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            SizedBox(height: 12),
+            HourlyGrid(
+              onSelect: _onTimeslotValueChange,
+              unavailable: _timeSlotsToExlude(),
+              initialSelected: _timeSelectedOfDate(_currentSelectedDate),
+            ),
+          ],
         )
         : Container();
   }

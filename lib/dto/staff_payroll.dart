@@ -7,9 +7,9 @@ class StaffPayroll {
   final int upcomingSessionCount;
   final DateTime lastPaidDate;
   final int lastMonthSessions;
-  final int lastMonthPaid;
+  final double lastMonthPaid;
   final double dueAmount;
-  List<Schedule> upcomingSchedules = [];
+  List<Schedule> upcomingSchedules;
 
   StaffPayroll({
     required this.staff,
@@ -19,5 +19,6 @@ class StaffPayroll {
     required this.lastMonthSessions,
     required this.lastMonthPaid,
     required this.dueAmount,
+    this.upcomingSchedules = const [],
   });
 }

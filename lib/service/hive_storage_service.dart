@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:path_provider/path_provider.dart' as path_provider;
+import 'package:schedulerapp/dto/expiring_client_session.dart';
+import 'package:schedulerapp/dto/gym_stats.dart';
+
+import 'package:schedulerapp/dto/staff_payroll.dart';
+import 'package:schedulerapp/dto/trainee_item_detail.dart';
 import 'package:schedulerapp/exception/schdule_conflict_exception.dart';
 import 'package:schedulerapp/entity/gym_package.dart';
 import 'package:schedulerapp/entity/schedule.dart';
@@ -61,17 +66,44 @@ class HiveStorageService implements StorageService {
 
   @override
   Future<List<Schedule>> getUpcomingSchedule(Staff staff, DateTime date) async {
-    var upcomingSchedules =
-        _scheduleBox.values.toList().where((schedule) {
-          return schedule.trainer.name == staff.name &&
-              schedule.startTime.isAfter(DateTime.now());
-        }).toList();
-    return Future.value(upcomingSchedules);
+    // var upcomingSchedules =
+    //     _scheduleBox.values.toList().where((schedule) {
+    //       return schedule.trainer.name == staff.name &&
+    //           schedule.startTime.isAfter(DateTime.now());
+    //     }).toList();
+    return Future.value(_getUpcomingSchedule(staff, date));
+  }
+
+  List<Schedule> _getUpcomingSchedule(Staff staff, DateTime date) {
+    return _scheduleBox.values
+        .where(
+          (schedule) =>
+              schedule.trainer.name == staff.name &&
+              schedule.startTime.isAfter(DateTime.now()),
+        )
+        .toList();
   }
 
   @override
   Future<List<Trainee>> getTraineeList() {
     return Future.value(_traineeBox.values.toList());
+  }
+
+  @override
+  Future<List<TraineeItemDetail>> getTraineeDetailList() {
+    List<TraineeItemDetail> list =
+        _traineeBox.values
+            .map(
+              (trainee) => TraineeItemDetail(
+                trainee: trainee,
+                packages:
+                    _packageBox.values
+                        .where((package) => package.traineeId == trainee.id)
+                        .toList(),
+              ),
+            )
+            .toList();
+    return Future.value(list);
   }
 
   @override
@@ -255,5 +287,121 @@ class HiveStorageService implements StorageService {
       GymPackage(UniqueKey().toString(), 'Cardio', 12, 120.0, 12, ''),
     ];
     //return ['Yoga', 'Personal Training', 'Group Class', 'HIIT', 'Cardio'];
+  }
+
+  @override
+  List<ExpiringClientSession> fetchClientsWithExpiringSessions() {
+    List<ExpiringClientSession> expiringSessions = [];
+    for (var trainee in _traineeBox.values) {
+      var activePackages = getTraineeActivePackages(trainee);
+      for (var package in activePackages) {
+        if (package.noOfSessionsAvailable <= 2) {
+          expiringSessions.add(ExpiringClientSession(trainee, package));
+        }
+      }
+    }
+    return expiringSessions;
+    // return [
+    //   ExpiringClientSession(
+    //     Trainee(
+    //       id: UniqueKey().toString(),
+    //       name: "Andrew",
+    //       imageUrl: 'assets/images/trainee1.png',
+    //       feePerSession: 10.0,
+    //       sessionsLeft: 0,
+    //     ),
+    //     GymPackage(
+    //       UniqueKey().toString(),
+    //       "",
+    //       10,
+    //       100,
+    //       0,
+    //       UniqueKey().toString(),
+    //     ),
+    //   ),
+    //   ExpiringClientSession(
+    //     Trainee(
+    //       id: UniqueKey().toString(),
+    //       name: "Yin",
+    //       imageUrl: 'assets/images/trainee2.png',
+    //       feePerSession: 12.0,
+    //       sessionsLeft: 0,
+    //     ),
+    //     GymPackage(
+    //       UniqueKey().toString(),
+    //       "",
+    //       10,
+    //       100,
+    //       0,
+    //       UniqueKey().toString(),
+    //     ),
+    //   ),
+    //   ExpiringClientSession(
+    //     Trainee(
+    //       id: UniqueKey().toString(),
+    //       name: "Mahat",
+    //       imageUrl: 'assets/images/trainee3.png',
+    //       feePerSession: 12.0,
+    //       sessionsLeft: 1,
+    //     ),
+
+    //     GymPackage(
+    //       UniqueKey().toString(),
+    //       "",
+    //       10,
+    //       100,
+    //       1,
+    //       UniqueKey().toString(),
+    //     ),
+    //   ),
+    //   ExpiringClientSession(
+    //     Trainee(
+    //       id: UniqueKey().toString(),
+    //       name: "Fiona",
+    //       imageUrl: 'assets/images/trainee1.png',
+    //       feePerSession: 12.0,
+    //       sessionsLeft: 2,
+    //     ),
+
+    //     GymPackage(
+    //       UniqueKey().toString(),
+    //       "",
+    //       10,
+    //       100,
+    //       2,
+    //       UniqueKey().toString(),
+    //     ),
+    //   ),
+    // ];
+  }
+
+  @override
+  List<StaffPayroll> getPayrollDetailsOfAllStaff() {
+    return _staffBox.values.map((staff) {
+      var completedSessions = getCountOfPastSessionsByTrainer(
+        staff,
+        DateTime.now().subtract(Duration(days: 30)),
+        DateTime.now(),
+      );
+      var upcomingSessions = _getUpcomingSchedule(staff, DateTime.now());
+      return StaffPayroll(
+        staff: staff,
+        sessionCompleted: completedSessions,
+        upcomingSessionCount: upcomingSessions.length,
+        lastPaidDate: DateTime.now().subtract(Duration(days: 30)),
+        lastMonthSessions: completedSessions + upcomingSessions.length,
+        lastMonthPaid: completedSessions * staff.payRate,
+        dueAmount: 0.0, // Placeholder for due amount
+        upcomingSchedules: upcomingSessions,
+      );
+    }).toList();
+  }
+
+  @override
+  GymStats getGymStats() {
+    return GymStats(
+      totalTrainers: getNoOfTrainers(),
+      totalActiveClients: getNoOfActiveClients(),
+    );
   }
 }

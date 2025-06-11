@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:schedulerapp/component/add_package_dialog.dart';
+import 'package:schedulerapp/constant.dart';
 import 'package:schedulerapp/entity/gym_package.dart';
 import 'package:schedulerapp/entity/trainee.dart';
 import 'package:schedulerapp/service/storage_service.dart';
@@ -49,7 +51,7 @@ class _TraineePackageManagerWidgetState
     }
 
     return SizedBox(
-      height: 90.0,
+      height: 100.0,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: packages.length + 1,
@@ -59,49 +61,72 @@ class _TraineePackageManagerWidgetState
             final package = packages[index];
             return GestureDetector(
               onTap: () {
-                setState(() {
-                  _selectedPackage = package;
-                });
+                setState(() => _selectedPackage = package);
                 widget.onPackageSelect(_selectedPackage);
               },
               child: SizedBox(
-                width: 100.0,
-                child: Card(
-                  color:
-                      _selectedPackage == package
-                          ? Color(0xffEFF6FF)
-                          : Colors.white,
+                width: 200.0,
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8.0),
+                    color:
+                        _selectedPackage == package
+                            ? Color(0xffEFF6FF)
+                            : Colors.white,
+                    border: Border.all(
+                      color:
+                          _selectedPackage == package
+                              ? Color(0xff4A90E2)
+                              : Color(0xffE5E7EB),
+                      width: 2.0,
+                    ),
+                  ),
                   child: Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0,
+                      vertical: 8.0,
+                    ),
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Row(
-                          mainAxisSize: MainAxisSize.min,
-                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
                           children: [
                             Text(
-                              '${package.noOfSessionsAvailable}',
-                              style: const TextStyle(
-                                fontSize: 25.0,
-                                fontWeight: FontWeight.bold,
+                              package.name,
+                              style: GoogleFonts.inter(
+                                fontSize: 16.0,
+                                fontWeight: FontWeight.w500,
                               ),
                             ),
-                            Text(
-                              ' Avl',
-                              style: const TextStyle(
-                                fontSize: 12.0,
-                                color: Colors.grey,
-                              ),
-                            ),
+                            _selectedPackage == package
+                                ? Icon(
+                                  Icons.check_circle,
+                                  color: Color(0xff4A90E2),
+                                  size: 20,
+                                )
+                                : const SizedBox.shrink(),
                           ],
                         ),
-                        const Spacer(),
+                        const SizedBox(height: 12.0),
                         Text(
-                          '\$${package.cost.toStringAsFixed(2)}',
-                          style: const TextStyle(
+                          '${package.noOfSessionsAvailable} sessions remaining',
+                          style: GoogleFonts.inter(
                             fontSize: 12.0,
-                            color: Colors.grey,
+                            color: colorGreyTwo,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 3.0),
+                        Text(
+                          '\$${package.cost.toStringAsFixed(2)}/session',
+                          style: GoogleFonts.inter(
+                            fontSize: 12.0,
+                            color: colorGreyTwo,
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),

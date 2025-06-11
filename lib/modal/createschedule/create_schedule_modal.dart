@@ -10,6 +10,8 @@ import 'package:schedulerapp/entity/gym_package.dart';
 import 'package:schedulerapp/entity/schedule.dart';
 import 'package:schedulerapp/entity/staff.dart';
 import 'package:schedulerapp/entity/trainee.dart';
+import 'package:schedulerapp/modal/createschedule/trainee_selection_widget.dart';
+import 'package:schedulerapp/modal/createschedule/trainer_selection_widget.dart';
 import 'package:schedulerapp/service/storage_service.dart';
 import 'package:schedulerapp/util/dialog_util.dart';
 
@@ -54,18 +56,12 @@ class _CreateScheduleModalState extends State<CreateScheduleModal> {
 
   @override
   Widget build(BuildContext context) {
-    // return Container(
-    //   color: Colors.white,
-    //   child: Column(
-    //     children: [ModalAppBar(title: 'Create Schedule'), addSchdeuleContent()],
-    //   ),
-    // );
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
         leading: CupertinoButton(
           padding: EdgeInsets.zero,
           onPressed: () => Navigator.pop(context),
-          child: Text('Done'),
+          child: Text('Cancel'),
         ),
         middle: Text(
           'Create Schedule',
@@ -89,20 +85,16 @@ class _CreateScheduleModalState extends State<CreateScheduleModal> {
     return Container(
       color: Colors.white,
       width: double.infinity,
-      padding: EdgeInsets.symmetric(horizontal: 16.0),
+      padding: EdgeInsets.only(left: 16.0, right: 16.0, top: 24.0),
       child: Column(
         mainAxisSize: MainAxisSize.max,
         children: [
-          traineeDropDown(),
-          SizedBox(height: 16),
-          selectedTrainee != null
-              ? TraineePackageManagerWidget(
-                trainee: selectedTrainee!,
-                onPackageSelect: (val) => selectedPackage = val,
-              )
-              : Container(),
-          SizedBox(height: selectedTrainee != null ? 16 : 0),
-          trainerDropDown(),
+          TraineeSelectionWidget(
+            onTraineeSelect: _onTraineeSelection,
+            onPackageSelect: _onPackageSelection,
+          ),
+          //SizedBox(height: 16),
+          TrainerSelectionWidget(onSelect: _onTrainerSelection),
           SizedBox(height: 16),
           selectedTrainer != null
               ? DateTimeSelector(
@@ -120,6 +112,21 @@ class _CreateScheduleModalState extends State<CreateScheduleModal> {
         ],
       ),
     );
+  }
+
+  _onTrainerSelection(trainer) {
+    print('Selected Trainer');
+    selectedTrainer = trainer;
+  }
+
+  _onTraineeSelection(Trainee trainee) {
+    print('Selected Trainee ${trainee.name}');
+    selectedTrainee = trainee;
+  }
+
+  _onPackageSelection(package) {
+    print('Selected Package: ${package.name}');
+    selectedPackage = package;
   }
 
   addSchdeuleContent() {
@@ -239,26 +246,9 @@ class _CreateScheduleModalState extends State<CreateScheduleModal> {
       children: [
         Text(
           'Select Trainee',
-          style: GoogleFonts.inter(
-            fontWeight: FontWeight.w500,
-            color: Colors.black,
-            fontSize: 16,
-          ),
+          style: GoogleFonts.inter(color: colorGreyTwo, fontSize: 14),
         ),
-        //SizedBox(height: 16),
-        // TextFormField(
-        //   decoration: InputDecoration(
-        //     prefixIcon: const Icon(Icons.search, color: colorgrey),
-        //     hintText: 'Search Trainee',
-        //     fillColor: colorgreyShadeThree,
-        //     filled: true,
-        //     contentPadding: const EdgeInsets.symmetric(vertical: 10.0),
-        //     border: OutlineInputBorder(
-        //       borderRadius: BorderRadius.circular(15.0),
-        //       borderSide: BorderSide.none,
-        //     ),
-        //   ),
-        // ),
+
         SizedBox(height: 16),
         FutureBuilder<List<Trainee>>(
           future: _traineeListFuture,
@@ -431,36 +421,6 @@ class _CreateScheduleModalState extends State<CreateScheduleModal> {
         ),
       ],
     );
-    // return Padding(
-    //   padding: const EdgeInsets.symmetric(vertical: 8.0),
-    //   child: FutureBuilder<List<Staff>>(
-    //     future: _storageService.getStaffList(),
-    //     builder: (context, snapshot) {
-    //       return DropdownButtonFormField<Staff>(
-    //         value: snapshot.hasData ? selectedTrainer : null,
-    //         items:
-    //             (snapshot.hasData)
-    //                 ? snapshot.data!
-    //                     .map(
-    //                       (staff) => DropdownMenuItem(
-    //                         value: staff,
-    //                         child: Text(staff.name),
-    //                       ),
-    //                     )
-    //                     .toList()
-    //                 : [],
-    //         onChanged:
-    //             snapshot.hasData
-    //                 ? (value) => setState(() => selectedTrainer = value)
-    //                 : null,
-    //         decoration: InputDecoration(
-    //           labelText: 'Select Trainer',
-    //           border: OutlineInputBorder(),
-    //         ),
-    //       );
-    //     },
-    //   ),
-    // );
   }
 
   locationTextField() {
@@ -471,21 +431,25 @@ class _CreateScheduleModalState extends State<CreateScheduleModal> {
         Text(
           'Location (Optional)',
           style: GoogleFonts.inter(
-            color: Colors.black,
-            fontSize: 16,
+            color: colorBlackShadeFour,
+            fontSize: 14,
             fontWeight: FontWeight.w500,
           ),
         ),
         SizedBox(height: 10),
-        CupertinoTextFormFieldRow(
+        CupertinoTextField(
           controller: _locationController,
-          // decoration: InputDecoration(
-          //   prefixIcon: Icon(Icons.location_on_outlined),
-          //   labelText: 'Enter Location',
-          //   border: OutlineInputBorder(
-          //     borderSide: BorderSide(color: Color(0xff9CA3AF)),
-          //   ),
-          // ),
+          placeholder: 'Enter location',
+          prefix: const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 8.0),
+            child: Icon(CupertinoIcons.location_solid, color: colorGray),
+          ),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8.0),
+            border: Border.all(color: colorGray),
+          ),
+          padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+          clearButtonMode: OverlayVisibilityMode.editing,
         ),
       ],
     );

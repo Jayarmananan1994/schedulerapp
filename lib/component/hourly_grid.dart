@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:schedulerapp/constant.dart';
 
 List<List<List<String>>> timeSlotMap = [
@@ -56,7 +57,7 @@ class _HourlyGridState extends State<HourlyGrid> {
             : null;
 
     return SizedBox(
-      height: 80,
+      height: 110,
       child: PageView.builder(
         itemCount: 6,
         itemBuilder: (context, index) {
@@ -72,6 +73,7 @@ class _HourlyGridState extends State<HourlyGrid> {
     return Column(
       children: [
         Row(children: slotsOne.map((slot) => _timeContainer(slot)).toList()),
+        SizedBox(height: 10),
         Row(children: slotsTwo.map((slot) => _timeContainer(slot)).toList()),
       ],
     );
@@ -84,44 +86,34 @@ class _HourlyGridState extends State<HourlyGrid> {
       child: GestureDetector(
         onTap: isUnavailable ? null : () => _handleOnTimeSelect(timeLabel),
         child: Padding(
-          padding: const EdgeInsets.all(2.0),
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.fromLTRB(0, 0, 8, 0),
+          child: Container(
+            height: 46,
+            width: 78,
             decoration: BoxDecoration(
               color:
                   isUnavailable
-                      ? Colors.grey
+                      ? colorgreyShadeThree
                       : (timeLabel == selectedTimeOption)
-                      ? Colors.green[800]?.withOpacity(0.8)
-                      : colorgreyShadeThree,
-              borderRadius: BorderRadius.circular(5.0),
-              border:
-                  (timeLabel == selectedTimeOption)
-                      ? Border.all(color: Colors.green[700]!, width: 1)
-                      : null,
-              boxShadow:
-                  (timeLabel == selectedTimeOption)
-                      ? [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.2),
-                          blurRadius: 4,
-                          offset: const Offset(0, 2),
-                        ),
-                      ]
-                      : null,
+                      ? colorBlueshade
+                      : colorShadowGrey,
+              borderRadius: BorderRadius.circular(12.0),
+              border: Border.all(
+                color:
+                    (timeLabel == selectedTimeOption)
+                        ? colorLightBlue
+                        : colorGray,
+                width: 1,
+              ),
             ),
 
             padding: EdgeInsets.all(5),
             child: Center(
               child: Text(
                 timeLabel,
-                style: TextStyle(
-                  color:
-                      isUnavailable
-                          ? Colors.grey[100]
-                          : (timeLabel == selectedTimeOption)
-                          ? Colors.grey[200]
-                          : Colors.black,
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  color: isUnavailable ? colorDisableGray : Colors.black,
                 ),
               ),
             ),

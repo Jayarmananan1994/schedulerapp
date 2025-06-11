@@ -3,6 +3,7 @@ import 'package:schedulerapp/page/dashboard/new_dashboard_screen.dart';
 import 'package:schedulerapp/page/gym_management/gym_management_screen.dart';
 import 'package:schedulerapp/page/payroll/staff_payroll_screen.dart';
 import 'package:schedulerapp/page/schedule_screen.dart';
+import 'package:schedulerapp/page/setting_screen/setting_screen.dart';
 
 class HomePage extends StatelessWidget {
   final List<Widget> tabs = [
@@ -10,6 +11,7 @@ class HomePage extends StatelessWidget {
     ScheduleScreen(),
     StaffPayrollScreen(),
     GymManagementScreen(),
+    SettingScreen(),
   ];
 
   HomePage({super.key});
@@ -39,6 +41,10 @@ class HomePage extends StatelessWidget {
           ),
           BottomNavigationBarItem(
             icon: Icon(CupertinoIcons.person_crop_circle),
+            // label: 'Gym Management',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(CupertinoIcons.settings),
             // label: 'Gym Management',
           ),
         ],

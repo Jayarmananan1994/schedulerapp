@@ -77,6 +77,12 @@ flutter:
      - assets/images/trainer5.png
      - assets/images/trainer6.png
      - assets/images/trainee1.png
+     - assets/images/trainee2.png
+     - assets/images/trainee3.png
+     - assets/images/trainee4.png
+     - assets/images/trainee5.png
+     - assets/images/trainee6.png
+     - assets/images/chill_guy.png
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

@@ -29,9 +29,6 @@ class _AddClientModalState extends State<AddClientModal> {
   String? _priceError;
   String? _selectedAvatar = trainerAvatarImageUrls.first;
   GymPackage? _selectedPackage;
-  // String? _selectedPackageName;
-  // int _sessionCount = 0;
-  // double _price = 0.0;
 
   @override
   void dispose() {
@@ -46,7 +43,7 @@ class _AddClientModalState extends State<AddClientModal> {
       navigationBar: CupertinoNavigationBar(
         leading: CupertinoButton(
           padding: EdgeInsets.zero,
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => Navigator.pop(context, false),
           child: Text('Cancel'),
         ),
         middle: Text(
@@ -61,7 +58,11 @@ class _AddClientModalState extends State<AddClientModal> {
   contentIos() {
     return SafeArea(
       child: CustomScrollView(
-        slivers: [SliverFillRemaining(child: formContent())],
+        slivers: [
+          SliverFillRemaining(
+            child: SingleChildScrollView(child: formContent()),
+          ),
+        ],
       ),
     );
   }
@@ -238,9 +239,7 @@ class _AddClientModalState extends State<AddClientModal> {
   }
 
   _saveTrainee() async {
-    print('Form Validate called: ${_formValidate()}');
     if (_formValidate()) {
-      print('Save Trainee called');
       final name = _nameController.text;
 
       var newTrainee = Trainee(
@@ -257,13 +256,12 @@ class _AddClientModalState extends State<AddClientModal> {
         double.parse(_priceTextController.text),
         newTrainee.id,
       );
-      print('Saved new trainee: $newTrainee');
       showCupertinoDialog(
         context: context,
         builder:
             (context) => CupertinoAlertDialog(
               title: Text('Success'),
-              content: Text('New Trainer added.'),
+              content: Text('New Client added.'),
               actions: [
                 CupertinoDialogAction(
                   child: Text('OK'),
@@ -276,27 +274,6 @@ class _AddClientModalState extends State<AddClientModal> {
       ).then((_) {
         Navigator.pop(context, true);
       });
-
-      // .catchError((error) {
-      //   showCupertinoDialog(
-      //     context: context,
-      //     builder:
-      //         (context) => CupertinoAlertDialog(
-      //           title: Text('Error', style: TextStyle(color: Colors.red)),
-      //           content: Text('Failed to create new Trainer'),
-      //           actions: [
-      //             CupertinoDialogAction(
-      //               child: Text('OK'),
-      //               onPressed: () {
-      //                 Navigator.pop(context);
-      //               },
-      //             ),
-      //           ],
-      //         ),
-      //   ).then((_) {
-      //     Navigator.pop(context, true);
-      //   });
-      // });
     }
   }
 

@@ -1,5 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:schedulerapp/constant.dart';
 
 List<String> months = [
   'January',
@@ -59,96 +61,92 @@ class _MonthDaySelectorState extends State<MonthDaySelector> {
   Widget build(BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.min,
-      children: [monthTitle(), monthDaysList()],
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [monthTitle(), SizedBox(height: 12), monthDaysList()],
     );
   }
 
   monthTitle() {
-    return SizedBox(
-      height: 50,
-      //decoration: BoxDecoration(border: Border.all(color: Colors.black)),
-      //padding: const EdgeInsets.only(top: 20),
-      child: Text(
-        months[widget.selectedDay.month - 1],
-        style: GoogleFonts.inter(
-          color: const Color.fromARGB(255, 59, 57, 57),
-          fontSize: 30,
-          fontWeight: FontWeight.bold,
-        ),
+    return Container(
+      padding: const EdgeInsets.only(top: 12, bottom: 8),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            '${months[widget.selectedDay.month - 1]}, ${widget.selectedDay.day}',
+            style: GoogleFonts.inter(color: Colors.black, fontSize: 20),
+          ),
+          //const Spacer(),
+          IconButton(
+            onPressed: () => _showiOSCalendar(context),
+            icon: Icon(CupertinoIcons.calendar),
+          ),
+        ],
       ),
     );
   }
 
   monthDaysList() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 25),
-      child: SizedBox(
-        height: 100,
-        child: ListView.builder(
-          controller: _scrollController,
-          scrollDirection: Axis.horizontal,
-          itemCount: dayCounts(),
-          itemBuilder: (context, index) {
-            return numberButton((index + 1));
-          },
-        ),
+    return SizedBox(
+      height: 50,
+      child: ListView.builder(
+        controller: _scrollController,
+        scrollDirection: Axis.horizontal,
+        itemCount: dayCounts(),
+        itemBuilder: (context, index) {
+          return numberButton((index + 1));
+        },
       ),
     );
   }
 
   numberButton(int number) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(2),
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              splashColor: Colors.green[800],
-              onTap:
-                  () => widget.onDateSelected(
-                    DateTime(
-                      widget.selectedDay.year,
-                      widget.selectedDay.month,
-                      number,
-                    ),
-                  ),
-              child: Container(
-                width: 45,
-                padding: const EdgeInsets.all(5),
-                decoration: BoxDecoration(
-                  color:
-                      (number == widget.selectedDay.day)
-                          ? Colors.green[800]
-                          : Colors.transparent,
-                  shape: BoxShape.circle,
-                ),
-                child: Center(
-                  child: Text(
-                    number.toString(),
-                    style: TextStyle(
-                      color:
-                          (number == widget.selectedDay.day)
-                              ? Colors.white
-                              : Colors.black54,
-                      fontSize: 18,
-                    ),
-                  ),
-                ),
+    return GestureDetector(
+      onTap: () {
+        widget.onDateSelected(
+          DateTime(widget.selectedDay.year, widget.selectedDay.month, number),
+        );
+      },
+      child: Container(
+        width: 60,
+        // height: 44,
+        decoration: BoxDecoration(
+          color:
+              (number == widget.selectedDay.day)
+                  ? colorBlueTwo
+                  : Colors.transparent,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Column(
+          //mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              dayOfMonths(number.toString()),
+              style: GoogleFonts.inter(
+                fontSize: 12,
+                color:
+                    (number == widget.selectedDay.day)
+                        ? Colors.white
+                        : colorGreyTwo,
               ),
             ),
-          ),
+            SizedBox(height: 4),
+            Text(
+              number.toString(),
+              style: GoogleFonts.inter(
+                fontWeight: FontWeight.w500,
+                color:
+                    (number == widget.selectedDay.day)
+                        ? Colors.white
+                        : colorGreyTwo,
+                fontSize: 14,
+              ),
+            ),
+          ],
         ),
-        Text(
-          dayOfMonths(number.toString()),
-
-          style: const TextStyle(
-            fontSize: 15,
-            color: Color.fromARGB(255, 108, 105, 105),
-          ),
-        ),
-      ],
+      ),
     );
   }
 
@@ -201,6 +199,44 @@ class _MonthDaySelectorState extends State<MonthDaySelector> {
       scrollOffset.clamp(0, _scrollController.position.maxScrollExtent),
       duration: Duration(milliseconds: 300),
       curve: Curves.easeOut,
+    );
+  }
+
+  _showiOSCalendar(BuildContext context) async {
+    showCupertinoModalPopup<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          height: 250,
+          color: CupertinoColors.systemBackground.resolveFrom(context),
+          child: Column(
+            children: <Widget>[
+              Expanded(
+                child: CupertinoDatePicker(
+                  mode: CupertinoDatePickerMode.dateAndTime,
+                  initialDateTime: widget.selectedDay,
+                  minimumDate: DateTime(2000),
+                  maximumDate: DateTime(2035),
+                  onDateTimeChanged: (DateTime newDate) {
+                    print('Selected date: $newDate');
+                    // Update the selected date as the user scrolls
+                    // setState(() {
+                    //   _selectedDate = newDate;
+                    // });
+                  },
+                ),
+              ),
+              CupertinoButton(
+                child: const Text('Done'),
+                onPressed: () {
+                  print('Selected date: ${widget.selectedDay}');
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

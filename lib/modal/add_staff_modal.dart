@@ -141,8 +141,8 @@ class _AddStaffModalState extends State<AddStaffModal> {
 
   CupertinoTextField _textField(controller, placeholder) {
     return CupertinoTextField(
-      controller: _roleController,
-      placeholder: 'e.g. Fitness Coach, Yoga Instructor',
+      controller: controller,
+      placeholder: placeholder,
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
       decoration: BoxDecoration(
         color: coloGreyShadeFour,
@@ -234,8 +234,8 @@ class _AddStaffModalState extends State<AddStaffModal> {
       );
       _storageService
           .saveTrainer(newStaff)
-          .then((value) {
-            showCupertinoDialog(
+          .then((value) async {
+            await showCupertinoDialog(
               context: context,
               builder:
                   (context) => CupertinoAlertDialog(
@@ -250,12 +250,11 @@ class _AddStaffModalState extends State<AddStaffModal> {
                       ),
                     ],
                   ),
-            ).then((_) {
-              Navigator.pop(context, true);
-            });
+            );
+            Navigator.pop(context, true);
           })
-          .catchError((error) {
-            showCupertinoDialog(
+          .catchError((error) async {
+            await showCupertinoDialog(
               context: context,
               builder:
                   (context) => CupertinoAlertDialog(
@@ -270,9 +269,8 @@ class _AddStaffModalState extends State<AddStaffModal> {
                       ),
                     ],
                   ),
-            ).then((_) {
-              Navigator.pop(context, true);
-            });
+            );
+            Navigator.pop(context, false);
           });
     }
   }

@@ -1,6 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:schedulerapp/dto/trainee_item_detail.dart';
 import 'package:schedulerapp/modal/add_client/add_client_modal.dart';
 import 'package:schedulerapp/component/client_detail_modal.dart';
 import 'package:schedulerapp/entity/trainee.dart';
@@ -24,8 +25,8 @@ class _TraineeListScreenState extends State<TraineeListScreen> {
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
       ),
-      body: FutureBuilder<List<Trainee>>(
-        future: _storageService.getTraineeList(),
+      body: FutureBuilder<List<TraineeItemDetail>>(
+        future: _storageService.getTraineeDetailList(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -40,7 +41,7 @@ class _TraineeListScreenState extends State<TraineeListScreen> {
             return ListView.builder(
               itemCount: traineeList.length,
               itemBuilder: (context, index) {
-                final trainee = traineeList[index];
+                final trainee = traineeList[index].trainee;
                 return ListTile(
                   leading: CircleAvatar(
                     radius: 20,

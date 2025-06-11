@@ -28,6 +28,7 @@ const colorBlackTwo = Color(0xFF1C1C1E);
 const colorgrey = Color(0XFF6B7280);
 const colorBlue = Color(0xff2563EB);
 const colorGreenLight = Color(0xffDCFCE7);
+const colorGreenShadow = Color(0xffD1FAE5);
 const colorgreen = Color(0xff15803D);
 const colorShadowGrey = Color(0xffF9FAFB);
 const colorWarning = Color(0xffA16207);
@@ -37,12 +38,20 @@ const colorBlueTwo = Color(0xff007AFF);
 const colorgreyShadeThree = Color(0xffF3F4F6);
 const coloGreyShadeFour = Color(0xffF2F2F7);
 const colorGreyShadeFive = Color(0xffF5F5F5);
+const colorBlueshade = Color(0xffEFF6FF);
+const colorBlackShadeFour = Color(0xff374151);
+const colorBlueDark = Color(0xff4A90E2);
+const colorGray = Color(0xffE5E7EB);
+const colorDisableGray = Color(0xff9CA3AF);
+const colorLightBlue = Color(0xffBFDBFE);
+const colorGrayBorder = Color(0xffC7C7CC);
+const colorRed = Color(0xffFF3B30);
 
 const trainerAvatarImageUrls = [
-  'assets/images/trainer1.png',
-  'assets/images/trainer2.png',
-  'assets/images/trainer3.png',
-  'assets/images/trainer4.png',
-  'assets/images/trainer5.png',
-  'assets/images/trainer6.png',
+  'assets/images/trainee2.png',
+  'assets/images/trainee1.png',
+  'assets/images/trainee3.png',
+  'assets/images/trainee4.png',
+  'assets/images/trainee5.png',
+  'assets/images/trainee6.png',
 ];

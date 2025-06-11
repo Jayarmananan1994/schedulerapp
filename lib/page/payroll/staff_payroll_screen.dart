@@ -1,11 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:schedulerapp/constant.dart';
 import 'package:schedulerapp/entity/staff.dart';
-import 'package:schedulerapp/entity/staff_payroll.dart';
+import 'package:schedulerapp/dto/staff_payroll.dart';
 import 'package:schedulerapp/page/payroll/payroll_detail_widget.dart';
+import 'package:schedulerapp/service/storage_service.dart';
 
 class StaffPayrollScreen extends StatefulWidget {
   const StaffPayrollScreen({super.key});
@@ -16,6 +18,8 @@ class StaffPayrollScreen extends StatefulWidget {
 
 class _StaffPayrollScreenState extends State<StaffPayrollScreen> {
   DateFormat dateFormat = DateFormat('MMM yyyy');
+  final StorageService _storageService = GetIt.instance<StorageService>();
+
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
@@ -138,39 +142,10 @@ class _StaffPayrollScreenState extends State<StaffPayrollScreen> {
   }
 
   staffList() {
-    var payrollList = [
-      StaffPayroll(
-        staff: Staff(id: '123', name: 'Sarah Johnson', payRate: 45),
-        sessionCompleted: 20,
-        upcomingSessionCount: 10,
-
-        lastPaidDate: DateTime.now().copyWith(month: 4),
-        lastMonthSessions: 38,
-        lastMonthPaid: 1380,
-        dueAmount: 1800,
-      ),
-      StaffPayroll(
-        staff: Staff(id: '124', name: 'Michael Chen', payRate: 50),
-        sessionCompleted: 22,
-        upcomingSessionCount: 8,
-        lastPaidDate: DateTime.now().copyWith(month: 4),
-        lastMonthSessions: 30,
-        lastMonthPaid: 1650,
-        dueAmount: 1600,
-      ),
-      StaffPayroll(
-        staff: Staff(id: '125', name: 'Emma Davis', payRate: 55),
-        sessionCompleted: 18,
-        upcomingSessionCount: 2,
-        lastPaidDate: DateTime.now().copyWith(month: 4),
-        lastMonthSessions: 24,
-        lastMonthPaid: 1300,
-        dueAmount: 1000,
-      ),
-    ];
     return Column(
       children:
-          payrollList
+          _storageService
+              .getPayrollDetailsOfAllStaff()
               .map((payroll) => PayrollDetailWidget(staffPayroll: payroll))
               .toList(),
     );

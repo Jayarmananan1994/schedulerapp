@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:schedulerapp/dto/expiring_client_session.dart';
+import 'package:schedulerapp/dto/gym_stats.dart';
+import 'package:schedulerapp/dto/payroll_detail_item.dart';
+import 'package:schedulerapp/dto/staff_payroll.dart';
+import 'package:schedulerapp/dto/trainee_item_detail.dart';
 import 'package:schedulerapp/entity/gym_package.dart';
 import 'package:schedulerapp/entity/schedule.dart';
 import 'package:schedulerapp/entity/staff.dart';
@@ -9,6 +14,7 @@ abstract class StorageService {
   List<Schedule> getScheduleItems(DateTime date);
   Future<List<Staff>> getStaffList();
   Future<List<Schedule>> getUpcomingSchedule(Staff staff, DateTime date);
+  Future<List<TraineeItemDetail>> getTraineeDetailList();
   Future<List<Trainee>> getTraineeList();
   Future<bool> saveScheduleItem(Schedule schedule);
   Future<bool> saveTrainee(Trainee trainee);
@@ -46,4 +52,10 @@ abstract class StorageService {
   int getNoOfTrainers();
 
   List<GymPackage> getPackageList();
+
+  List<ExpiringClientSession> fetchClientsWithExpiringSessions();
+
+  List<StaffPayroll> getPayrollDetailsOfAllStaff();
+
+  GymStats getGymStats();
 }

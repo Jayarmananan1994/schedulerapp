@@ -58,7 +58,7 @@ class _ScheduleScreenState extends State<ScheduleScreen>
           mainAxisSize: MainAxisSize.min,
           children: [
             IconButton(
-              icon: const Icon(CupertinoIcons.ellipsis, size: 24),
+              icon: const Icon(CupertinoIcons.plus_circle_fill, size: 30),
               onPressed: () => _showActionsSheet(context),
             ),
             // IconButton(
@@ -79,7 +79,12 @@ class _ScheduleScreenState extends State<ScheduleScreen>
           slivers: [
             SliverToBoxAdapter(
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                padding: const EdgeInsets.only(
+                  left: 16.0,
+                  right: 16.0,
+                  top: 0.0,
+                  bottom: 24.0,
+                ),
                 child: MonthDaySelector(
                   selectedDay: _selectedDay ?? DateTime.now(),
                   onDateSelected: _onDateSelected,
@@ -220,6 +225,7 @@ class _ScheduleScreenState extends State<ScheduleScreen>
   }
 
   _onDateSelected(DateTime date) {
+    print('Selected date: $date');
     setState(() {
       _selectedDay = date;
     });
