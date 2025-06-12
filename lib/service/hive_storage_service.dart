@@ -404,4 +404,28 @@ class HiveStorageService implements StorageService {
       totalActiveClients: getNoOfActiveClients(),
     );
   }
+
+  @override
+  Future<int> deleteAllStaff() {
+    return _staffBox.clear();
+  }
+
+  @override
+  Future<int> deleteAllTrainee() {
+    return _traineeBox.clear();
+  }
+
+  @override
+  Future<int> deleteAllSchedules() {
+    return _scheduleBox.clear();
+  }
+
+  @override
+  Future<void> deleteAllData() {
+    return Future.wait([
+      _staffBox.clear(),
+      _traineeBox.clear(),
+      _scheduleBox.clear(),
+    ]);
+  }
 }

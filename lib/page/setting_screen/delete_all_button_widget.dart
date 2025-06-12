@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:schedulerapp/constant.dart';
+import 'package:schedulerapp/util/dialog_util.dart';
 
 class DeleteAllButtonWidget extends StatelessWidget {
   const DeleteAllButtonWidget({super.key});
@@ -37,37 +38,44 @@ class DeleteAllButtonWidget extends StatelessWidget {
   }
 
   _deleteAllDataConfirmation(context) {
-    showCupertinoModalPopup<void>(
-      context: context,
-      builder:
-          (BuildContext context) => CupertinoAlertDialog(
-            title: const Text('Confirm Action'),
-            content: const Text(
-              'Are you sure you want to proceed with this action?',
-            ),
-            actions: <CupertinoDialogAction>[
-              CupertinoDialogAction(
-                isDefaultAction: true,
-                onPressed: () {
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Action confirmed!')),
-                  );
-                },
-                child: const Text('Confirm'),
-              ),
-              CupertinoDialogAction(
-                isDestructiveAction: true,
-                onPressed: () {
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Action cancelled!')),
-                  );
-                },
-                child: const Text('Cancel'),
-              ),
-            ],
-          ),
-    );
+    showAppConfirmationDialog(
+      context,
+      "Confirm Action",
+      "Are you sure you want to proceed with this action?",
+    ).then((val) {
+      print(val);
+    });
+    // showCupertinoModalPopup<void>(
+    //   context: context,
+    //   builder:
+    //       (BuildContext context) => CupertinoAlertDialog(
+    //         title: const Text('Confirm Action'),
+    //         content: const Text(
+    //           'Are you sure you want to proceed with this action?',
+    //         ),
+    //         actions: <CupertinoDialogAction>[
+    //           CupertinoDialogAction(
+    //             isDefaultAction: true,
+    //             onPressed: () {
+    //               Navigator.pop(context);
+    //               ScaffoldMessenger.of(context).showSnackBar(
+    //                 const SnackBar(content: Text('Action confirmed!')),
+    //               );
+    //             },
+    //             child: const Text('Confirm'),
+    //           ),
+    //           CupertinoDialogAction(
+    //             isDestructiveAction: true,
+    //             onPressed: () {
+    //               Navigator.pop(context);
+    //               ScaffoldMessenger.of(context).showSnackBar(
+    //                 const SnackBar(content: Text('Action cancelled!')),
+    //               );
+    //             },
+    //             child: const Text('Cancel'),
+    //           ),
+    //         ],
+    //       ),
+    // );
   }
 }

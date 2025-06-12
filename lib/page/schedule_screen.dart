@@ -59,7 +59,8 @@ class _ScheduleScreenState extends State<ScheduleScreen>
           children: [
             IconButton(
               icon: const Icon(CupertinoIcons.plus_circle_fill, size: 30),
-              onPressed: () => _showActionsSheet(context),
+              onPressed:
+                  () => _showAddScheduleWindow(), // _showActionsSheet(context),
             ),
             // IconButton(
             //   icon: const Icon(CupertinoIcons.calendar_today, size: 24),

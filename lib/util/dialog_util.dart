@@ -27,7 +27,7 @@ showAppInfoDialog(
   );
 }
 
-showAppConfirmationDialog(context, title, confirmationText) {
+Future<dynamic> showAppConfirmationDialog(context, title, confirmationText) {
   return showCupertinoDialog(
     context: context,
     builder: (BuildContext context) {
@@ -42,7 +42,7 @@ showAppConfirmationDialog(context, title, confirmationText) {
           ),
           CupertinoDialogAction(
             isDefaultAction: true,
-            onPressed: () => Navigator.pop(context, 'Confirm'),
+            onPressed: () => Navigator.pop(context, true),
             child: const Text('Confirm'),
           ),
         ],

@@ -58,4 +58,10 @@ abstract class StorageService {
   List<StaffPayroll> getPayrollDetailsOfAllStaff();
 
   GymStats getGymStats();
+
+  Future<int> deleteAllStaff();
+
+  Future<int> deleteAllTrainee();
+  Future<int> deleteAllSchedules();
+  Future<void> deleteAllData();
 }

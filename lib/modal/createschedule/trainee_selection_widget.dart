@@ -79,9 +79,9 @@ class _TraineeSelectionWidgetState extends State<TraineeSelectionWidget> {
             onTap: () {
               print("Calling  widget.onTraineeSelect and ${trainees[index]}");
               widget.onTraineeSelect(trainees[index]);
-              // setState(() {
-              //   selectedTrainee = trainees[index];
-              // });
+              setState(() {
+                selectedTrainee = trainees[index];
+              });
             },
             child: Container(
               width: 80,
