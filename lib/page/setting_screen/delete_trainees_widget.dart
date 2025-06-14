@@ -6,7 +6,7 @@ import 'package:schedulerapp/service/storage_service.dart';
 import 'package:schedulerapp/util/dialog_util.dart';
 
 class DeleteTraineesWidget extends StatelessWidget {
-  StorageService _storageService = GetIt.I<StorageService>();
+  final StorageService _storageService = GetIt.I<StorageService>();
   DeleteTraineesWidget({super.key});
 
   @override
@@ -43,7 +43,7 @@ class DeleteTraineesWidget extends StatelessWidget {
     showAppConfirmationDialog(
       context,
       "Confirmation",
-      "Are you sure you want to delete trainee list",
+      "Are you sure you want to delete trainee list and thier package ",
     ).then((val) async {
       print(val);
       if (val) {

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:schedulerapp/dto/expiring_client_session.dart';
 import 'package:schedulerapp/dto/gym_stats.dart';
-import 'package:schedulerapp/dto/payroll_detail_item.dart';
 import 'package:schedulerapp/dto/staff_payroll.dart';
 import 'package:schedulerapp/dto/trainee_item_detail.dart';
 import 'package:schedulerapp/entity/gym_package.dart';

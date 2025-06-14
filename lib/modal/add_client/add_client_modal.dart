@@ -27,7 +27,7 @@ class _AddClientModalState extends State<AddClientModal> {
   String? _packageNameError;
   String? _noOfSessionError;
   String? _priceError;
-  String? _selectedAvatar = trainerAvatarImageUrls.first;
+  String? _selectedAvatar = traineeAvatarImageUrls.first;
   GymPackage? _selectedPackage;
 
   @override
@@ -197,13 +197,13 @@ class _AddClientModalState extends State<AddClientModal> {
       height: 100,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
-        itemCount: trainerAvatarImageUrls.length,
+        itemCount: traineeAvatarImageUrls.length,
         itemBuilder: (context, index) {
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4.0),
             child: GestureDetector(
               onTap: () {
-                setState(() => _selectedAvatar = trainerAvatarImageUrls[index]);
+                setState(() => _selectedAvatar = traineeAvatarImageUrls[index]);
               },
               child: Stack(
                 children: [
@@ -211,12 +211,12 @@ class _AddClientModalState extends State<AddClientModal> {
                     child: CircleAvatar(
                       radius: 40,
                       backgroundImage:
-                          trainerAvatarImageUrls[index].isNotEmpty
-                              ? AssetImage(trainerAvatarImageUrls[index])
+                          traineeAvatarImageUrls[index].isNotEmpty
+                              ? AssetImage(traineeAvatarImageUrls[index])
                               : null,
                     ),
                   ),
-                  _selectedAvatar == trainerAvatarImageUrls[index]
+                  _selectedAvatar == traineeAvatarImageUrls[index]
                       ? Positioned(
                         top: 0,
                         left: 50,

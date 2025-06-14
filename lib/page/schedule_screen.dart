@@ -317,45 +317,4 @@ class _ScheduleScreenState extends State<ScheduleScreen>
       _scrollToCurrentTime();
     }
   }
-
-  _showActionsSheet(context) {
-    showCupertinoModalPopup<String>(
-      context: context,
-      builder:
-          (sheetContext) => CupertinoActionSheet(
-            title: const Text('Choose an Action'),
-            message: const Text('Select an operation for your schedules:'),
-            actions: <CupertinoActionSheetAction>[
-              CupertinoActionSheetAction(
-                onPressed: () {
-                  Navigator.pop(sheetContext);
-                  _showAddScheduleWindow();
-                },
-                isDefaultAction: true,
-                child: const Text('Add New Schedule'),
-              ),
-              CupertinoActionSheetAction(
-                child: const Text('Filter Schedules'),
-                onPressed: () {
-                  Navigator.pop(sheetContext, 'Filter Schedules');
-                },
-              ),
-            ],
-            cancelButton: CupertinoActionSheetAction(
-              child: const Text('Cancel'),
-              onPressed: () {
-                Navigator.pop(
-                  sheetContext,
-                  'Cancel',
-                ); // Dismiss without performing action
-              },
-            ),
-          ),
-    ).then((String? value) {
-      if (value != null) {
-        if (value == 'Add New Schedule') {
-        } else if (value == 'Delete All Schedules') {}
-      } else {}
-    });
-  }
 }

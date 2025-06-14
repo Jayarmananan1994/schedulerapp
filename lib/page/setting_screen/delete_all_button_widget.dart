@@ -1,11 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:schedulerapp/constant.dart';
+import 'package:schedulerapp/service/storage_service.dart';
 import 'package:schedulerapp/util/dialog_util.dart';
 
 class DeleteAllButtonWidget extends StatelessWidget {
-  const DeleteAllButtonWidget({super.key});
+  final StorageService _storageService = GetIt.I<StorageService>();
+  DeleteAllButtonWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -42,40 +45,12 @@ class DeleteAllButtonWidget extends StatelessWidget {
       context,
       "Confirm Action",
       "Are you sure you want to proceed with this action?",
-    ).then((val) {
+    ).then((val) async {
       print(val);
+      if (val) {
+        await _storageService.deleteAllData();
+        showAppInfoDialog(context, 'Done', 'All data cleared:', 'Ok', false);
+      }
     });
-    // showCupertinoModalPopup<void>(
-    //   context: context,
-    //   builder:
-    //       (BuildContext context) => CupertinoAlertDialog(
-    //         title: const Text('Confirm Action'),
-    //         content: const Text(
-    //           'Are you sure you want to proceed with this action?',
-    //         ),
-    //         actions: <CupertinoDialogAction>[
-    //           CupertinoDialogAction(
-    //             isDefaultAction: true,
-    //             onPressed: () {
-    //               Navigator.pop(context);
-    //               ScaffoldMessenger.of(context).showSnackBar(
-    //                 const SnackBar(content: Text('Action confirmed!')),
-    //               );
-    //             },
-    //             child: const Text('Confirm'),
-    //           ),
-    //           CupertinoDialogAction(
-    //             isDestructiveAction: true,
-    //             onPressed: () {
-    //               Navigator.pop(context);
-    //               ScaffoldMessenger.of(context).showSnackBar(
-    //                 const SnackBar(content: Text('Action cancelled!')),
-    //               );
-    //             },
-    //             child: const Text('Cancel'),
-    //           ),
-    //         ],
-    //       ),
-    // );
   }
 }

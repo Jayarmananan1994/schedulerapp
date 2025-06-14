@@ -10,7 +10,8 @@ import 'package:schedulerapp/modal/add_client/add_client_modal.dart';
 import 'package:schedulerapp/service/storage_service.dart';
 
 class TraineeListWidget extends StatefulWidget {
-  const TraineeListWidget({super.key});
+  final Function onTraineeAdded;
+  const TraineeListWidget({super.key, required this.onTraineeAdded});
 
   @override
   State<TraineeListWidget> createState() => _TraineeListWidgetState();
@@ -178,6 +179,7 @@ class _TraineeListWidgetState extends State<TraineeListWidget> {
       setState(() {
         _traineeListFuture = _storageService.getTraineeDetailList();
       });
+      widget.onTraineeAdded();
     }
   }
 

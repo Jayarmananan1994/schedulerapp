@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:schedulerapp/constant.dart';
+import 'package:schedulerapp/dto/gym_stats.dart';
 import 'package:schedulerapp/entity/staff.dart';
 import 'package:schedulerapp/modal/add_staff_modal.dart';
 import 'package:schedulerapp/page/gym_management/trainee_list_widget.dart';
@@ -17,11 +18,12 @@ class GymManagementScreen extends StatefulWidget {
 
 class _GymManagementScreenState extends State<GymManagementScreen> {
   final StorageService _storageService = GetIt.I<StorageService>();
-  late Future<List<Staff>> _staffListFuture;
+
+  late GymStats statsDetail;
 
   @override
   void initState() {
-    _staffListFuture = _storageService.getStaffList();
+    statsDetail = _storageService.getGymStats();
     super.initState();
   }
 
@@ -59,7 +61,12 @@ class _GymManagementScreenState extends State<GymManagementScreen> {
                     SizedBox(height: 16),
                     staffList(context),
                     SizedBox(height: 16),
-                    TraineeListWidget(),
+                    TraineeListWidget(
+                      onTraineeAdded:
+                          () => setState(() {
+                            statsDetail = _storageService.getGymStats();
+                          }),
+                    ),
                   ],
                 ),
               ),
@@ -82,7 +89,6 @@ class _GymManagementScreenState extends State<GymManagementScreen> {
   }
 
   stats() {
-    var statsDetail = _storageService.getGymStats();
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
       child: Row(
@@ -91,13 +97,13 @@ class _GymManagementScreenState extends State<GymManagementScreen> {
           _statItem(
             Icons.groups,
             'Staff',
-            statsDetail.totalActiveClients.toString(),
+            statsDetail.totalTrainers.toString(),
             'Active Members',
           ),
           _statItem(
             Icons.groups_2,
             'Trainees',
-            statsDetail.totalTrainers.toString(),
+            statsDetail.totalActiveClients.toString(),
             'Active Members',
           ),
         ],
@@ -204,14 +210,14 @@ class _GymManagementScreenState extends State<GymManagementScreen> {
     );
     if (isCreated) {
       setState(() {
-        _staffListFuture = _storageService.getStaffList();
+        statsDetail = _storageService.getGymStats();
       });
     }
   }
 
   _staffList() {
     return FutureBuilder<List<Staff>>(
-      future: _staffListFuture,
+      future: _storageService.getStaffList(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());

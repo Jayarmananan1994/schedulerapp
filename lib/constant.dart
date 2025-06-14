@@ -47,11 +47,20 @@ const colorLightBlue = Color(0xffBFDBFE);
 const colorGrayBorder = Color(0xffC7C7CC);
 const colorRed = Color(0xffFF3B30);
 
-const trainerAvatarImageUrls = [
+const traineeAvatarImageUrls = [
   'assets/images/trainee2.png',
   'assets/images/trainee1.png',
   'assets/images/trainee3.png',
   'assets/images/trainee4.png',
   'assets/images/trainee5.png',
   'assets/images/trainee6.png',
+];
+
+const trainerAvatarImageUrls = [
+  'assets/images/trainer2.png',
+  'assets/images/trainer1.png',
+  'assets/images/trainer3.png',
+  'assets/images/trainer4.png',
+  'assets/images/trainer5.png',
+  'assets/images/trainer6.png',
 ];

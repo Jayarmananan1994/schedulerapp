@@ -13,6 +13,7 @@ import 'package:schedulerapp/entity/staff.dart';
 import 'package:schedulerapp/entity/trainee.dart';
 import 'package:schedulerapp/service/storage_service.dart';
 import 'package:schedulerapp/util/app_util.dart';
+import 'package:collection/collection.dart';
 
 class HiveStorageService implements StorageService {
   late Box<Staff> _staffBox;
@@ -274,19 +275,24 @@ class HiveStorageService implements StorageService {
 
   @override
   int getNoOfTrainers() {
+    print('No of staff: ${_staffBox.length}');
     return _staffBox.length;
   }
 
   @override
   List<GymPackage> getPackageList() {
-    return [
-      GymPackage(UniqueKey().toString(), 'Yoga', 10, 100.0, 10, ''),
-      GymPackage(UniqueKey().toString(), 'Personal Training', 5, 200.0, 5, ''),
-      GymPackage(UniqueKey().toString(), 'Group Class', 20, 50.0, 20, ''),
-      GymPackage(UniqueKey().toString(), 'HIIT', 15, 150.0, 15, ''),
-      GymPackage(UniqueKey().toString(), 'Cardio', 12, 120.0, 12, ''),
-    ];
-    //return ['Yoga', 'Personal Training', 'Group Class', 'HIIT', 'Cardio'];
+    // return [
+    //   GymPackage(UniqueKey().toString(), 'Yoga', 10, 100.0, 10, ''),
+    //   GymPackage(UniqueKey().toString(), 'Personal Training', 5, 200.0, 5, ''),
+    //   GymPackage(UniqueKey().toString(), 'Group Class', 20, 50.0, 20, ''),
+    //   GymPackage(UniqueKey().toString(), 'HIIT', 15, 150.0, 15, ''),
+    //   GymPackage(UniqueKey().toString(), 'Cardio', 12, 120.0, 12, ''),
+    // ];
+    return _packageBox.values
+        .groupListsBy((package) => package.name)
+        .values
+        .map((group) => group.first)
+        .toList();
   }
 
   @override
@@ -411,8 +417,12 @@ class HiveStorageService implements StorageService {
   }
 
   @override
-  Future<int> deleteAllTrainee() {
-    return _traineeBox.clear();
+  Future<int> deleteAllTrainee() async {
+    var response = await Future.wait([
+      _traineeBox.clear(),
+      _packageBox.clear(),
+    ]);
+    return response[0];
   }
 
   @override
@@ -426,6 +436,7 @@ class HiveStorageService implements StorageService {
       _staffBox.clear(),
       _traineeBox.clear(),
       _scheduleBox.clear(),
+      _packageBox.clear(),
     ]);
   }
 }

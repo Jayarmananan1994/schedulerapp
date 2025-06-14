@@ -4,7 +4,6 @@ import 'package:get_it/get_it.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:schedulerapp/constant.dart';
-import 'package:schedulerapp/entity/staff.dart';
 import 'package:schedulerapp/dto/staff_payroll.dart';
 import 'package:schedulerapp/page/payroll/payroll_detail_widget.dart';
 import 'package:schedulerapp/service/storage_service.dart';
@@ -55,55 +54,27 @@ class _StaffPayrollScreenState extends State<StaffPayrollScreen> {
   }
 
   contentIos() {
+    List<StaffPayroll> staffPayroll =
+        _storageService.getPayrollDetailsOfAllStaff();
+    double totalAmt = staffPayroll
+        .map((payroll) => payroll.dueAmount)
+        .reduce((a, b) => a + b);
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [monthOverviewDetail(), SizedBox(height: 32), staffList()],
+          children: [
+            monthOverviewDetail(totalAmt),
+            SizedBox(height: 32),
+            staffList(staffPayroll),
+          ],
         ),
       ),
     );
   }
 
-  staffPayrollTitle() {
-    return Row(
-      mainAxisSize: MainAxisSize.max,
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          'Staff Payroll',
-          style: GoogleFonts.inter(
-            fontWeight: FontWeight.bold,
-            fontSize: 20,
-            color: colorblack,
-          ),
-        ),
-        IconButton(icon: Icon(Icons.filter), onPressed: () {}),
-      ],
-    );
-  }
-
-  content() {
-    return Expanded(
-      child: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-
-            children: [
-              monthOverviewDetail(),
-              SizedBox(height: 16),
-              staffList(),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  monthOverviewDetail() {
+  monthOverviewDetail(double amount) {
     var currentDate = DateTime.now();
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -120,7 +91,7 @@ class _StaffPayrollScreenState extends State<StaffPayrollScreen> {
           ),
           SizedBox(height: 10),
           Text(
-            '\$12,450',
+            '\$ $amount',
             style: GoogleFonts.inter(
               fontWeight: FontWeight.bold,
               fontSize: 24,
@@ -141,11 +112,10 @@ class _StaffPayrollScreenState extends State<StaffPayrollScreen> {
     );
   }
 
-  staffList() {
+  staffList(List<StaffPayroll> staffPayroll) {
     return Column(
       children:
-          _storageService
-              .getPayrollDetailsOfAllStaff()
+          staffPayroll
               .map((payroll) => PayrollDetailWidget(staffPayroll: payroll))
               .toList(),
     );
