@@ -41,11 +41,11 @@ class HomePage extends StatelessWidget {
           ),
           BottomNavigationBarItem(
             icon: Icon(CupertinoIcons.person_crop_circle),
-            // label: 'Gym Management',
+            label: 'Gym Mngmnt',
           ),
           BottomNavigationBarItem(
             icon: Icon(CupertinoIcons.settings),
-            // label: 'Gym Management',
+            label: 'Settings',
           ),
         ],
       ),
