@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/adapters.dart';
+import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart' as path_provider;
 import 'package:schedulerapp/dto/expiring_client_session.dart';
 import 'package:schedulerapp/dto/gym_stats.dart';
 
 import 'package:schedulerapp/dto/staff_payroll.dart';
 import 'package:schedulerapp/dto/trainee_item_detail.dart';
+import 'package:schedulerapp/entity/upcoming_session.dart';
 import 'package:schedulerapp/exception/schdule_conflict_exception.dart';
 import 'package:schedulerapp/entity/gym_package.dart';
 import 'package:schedulerapp/entity/schedule.dart';
@@ -16,6 +18,8 @@ import 'package:schedulerapp/util/app_util.dart';
 import 'package:collection/collection.dart';
 
 class HiveStorageService implements StorageService {
+  final DateFormat _todayDateFormat = DateFormat('hh:mm a');
+  final DateFormat _dateFormat = DateFormat('dd MMM hh:mm');
   late Box<Staff> _staffBox;
   late Box<Trainee> _traineeBox;
   late Box<Schedule> _scheduleBox;
@@ -67,11 +71,6 @@ class HiveStorageService implements StorageService {
 
   @override
   Future<List<Schedule>> getUpcomingSchedule(Staff staff, DateTime date) async {
-    // var upcomingSchedules =
-    //     _scheduleBox.values.toList().where((schedule) {
-    //       return schedule.trainer.name == staff.name &&
-    //           schedule.startTime.isAfter(DateTime.now());
-    //     }).toList();
     return Future.value(_getUpcomingSchedule(staff, date));
   }
 
@@ -81,6 +80,39 @@ class HiveStorageService implements StorageService {
           (schedule) =>
               schedule.trainer.name == staff.name &&
               schedule.startTime.isAfter(DateTime.now()),
+        )
+        .toList();
+  }
+
+  List<Schedule> _getCompletedSessionForLastMonth(Staff staff) {
+    return _scheduleBox.values
+        .where(
+          (schedule) =>
+              schedule.trainer.name == staff.name &&
+              schedule.startTime.month == DateTime.now().month - 1 &&
+              schedule.startTime.year == DateTime.now().year,
+        )
+        .toList();
+  }
+
+  List<Schedule> _getCurrentMonthCompletedSession(Staff staff) {
+    return _scheduleBox.values
+        .where(
+          (schedule) =>
+              schedule.trainer.name == staff.name &&
+              schedule.startTime.isBefore(DateTime.now()) &&
+              schedule.startTime.month == DateTime.now().month,
+        )
+        .toList();
+  }
+
+  List<Schedule> _getCurrentMonthUpcomingSessions(Staff staff) {
+    return _scheduleBox.values
+        .where(
+          (schedule) =>
+              schedule.trainer.name == staff.name &&
+              schedule.startTime.isAfter(DateTime.now()) &&
+              schedule.startTime.month == DateTime.now().month,
         )
         .toList();
   }
@@ -275,19 +307,11 @@ class HiveStorageService implements StorageService {
 
   @override
   int getNoOfTrainers() {
-    print('No of staff: ${_staffBox.length}');
     return _staffBox.length;
   }
 
   @override
   List<GymPackage> getPackageList() {
-    // return [
-    //   GymPackage(UniqueKey().toString(), 'Yoga', 10, 100.0, 10, ''),
-    //   GymPackage(UniqueKey().toString(), 'Personal Training', 5, 200.0, 5, ''),
-    //   GymPackage(UniqueKey().toString(), 'Group Class', 20, 50.0, 20, ''),
-    //   GymPackage(UniqueKey().toString(), 'HIIT', 15, 150.0, 15, ''),
-    //   GymPackage(UniqueKey().toString(), 'Cardio', 12, 120.0, 12, ''),
-    // ];
     return _packageBox.values
         .groupListsBy((package) => package.name)
         .values
@@ -299,106 +323,32 @@ class HiveStorageService implements StorageService {
   List<ExpiringClientSession> fetchClientsWithExpiringSessions() {
     List<ExpiringClientSession> expiringSessions = [];
     for (var trainee in _traineeBox.values) {
-      var activePackages = getTraineeActivePackages(trainee);
+      var activePackages = _getTraineePackages(trainee);
       for (var package in activePackages) {
-        if (package.noOfSessionsAvailable <= 2) {
+        if (package.noOfSessionsAvailable <= 2 &&
+            !containUnusedSchedule(package.id)) {
           expiringSessions.add(ExpiringClientSession(trainee, package));
         }
       }
     }
     return expiringSessions;
-    // return [
-    //   ExpiringClientSession(
-    //     Trainee(
-    //       id: UniqueKey().toString(),
-    //       name: "Andrew",
-    //       imageUrl: 'assets/images/trainee1.png',
-    //       feePerSession: 10.0,
-    //       sessionsLeft: 0,
-    //     ),
-    //     GymPackage(
-    //       UniqueKey().toString(),
-    //       "",
-    //       10,
-    //       100,
-    //       0,
-    //       UniqueKey().toString(),
-    //     ),
-    //   ),
-    //   ExpiringClientSession(
-    //     Trainee(
-    //       id: UniqueKey().toString(),
-    //       name: "Yin",
-    //       imageUrl: 'assets/images/trainee2.png',
-    //       feePerSession: 12.0,
-    //       sessionsLeft: 0,
-    //     ),
-    //     GymPackage(
-    //       UniqueKey().toString(),
-    //       "",
-    //       10,
-    //       100,
-    //       0,
-    //       UniqueKey().toString(),
-    //     ),
-    //   ),
-    //   ExpiringClientSession(
-    //     Trainee(
-    //       id: UniqueKey().toString(),
-    //       name: "Mahat",
-    //       imageUrl: 'assets/images/trainee3.png',
-    //       feePerSession: 12.0,
-    //       sessionsLeft: 1,
-    //     ),
-
-    //     GymPackage(
-    //       UniqueKey().toString(),
-    //       "",
-    //       10,
-    //       100,
-    //       1,
-    //       UniqueKey().toString(),
-    //     ),
-    //   ),
-    //   ExpiringClientSession(
-    //     Trainee(
-    //       id: UniqueKey().toString(),
-    //       name: "Fiona",
-    //       imageUrl: 'assets/images/trainee1.png',
-    //       feePerSession: 12.0,
-    //       sessionsLeft: 2,
-    //     ),
-
-    //     GymPackage(
-    //       UniqueKey().toString(),
-    //       "",
-    //       10,
-    //       100,
-    //       2,
-    //       UniqueKey().toString(),
-    //     ),
-    //   ),
-    // ];
   }
 
   @override
   List<StaffPayroll> getPayrollDetailsOfAllStaff() {
     return _staffBox.values.map((staff) {
-      var completedSessions = getCountOfPastSessionsByTrainer(
-        staff,
-        DateTime.now().subtract(Duration(days: 30)),
-        DateTime.now(),
-      );
-      var upcomingSessions = _getUpcomingSchedule(staff, DateTime.now());
+      var currentCompletedSessions = _getCurrentMonthCompletedSession(staff);
+      var lastMonthCompletedSessions = _getCompletedSessionForLastMonth(staff);
+      var currentUpcomingSessions = _getCurrentMonthUpcomingSessions(staff);
       return StaffPayroll(
         staff: staff,
-        sessionCompleted: completedSessions,
-        upcomingSessionCount: upcomingSessions.length,
+        sessionCompleted: currentCompletedSessions.length,
+        upcomingSessionCount: currentUpcomingSessions.length,
         lastPaidDate: DateTime.now().subtract(Duration(days: 30)),
-        lastMonthSessions: completedSessions + upcomingSessions.length,
-        lastMonthPaid: completedSessions * staff.payRate,
-        dueAmount: 0.0, // Placeholder for due amount
-        upcomingSchedules: upcomingSessions,
+        lastMonthSessions: lastMonthCompletedSessions.length,
+        lastMonthPaid: lastMonthCompletedSessions.length * staff.payRate,
+        dueAmount: currentCompletedSessions.length * staff.payRate,
+        upcomingSchedules: currentUpcomingSessions,
       );
     }).toList();
   }
@@ -438,5 +388,65 @@ class HiveStorageService implements StorageService {
       _scheduleBox.clear(),
       _packageBox.clear(),
     ]);
+  }
+
+  List<GymPackage> _getTraineePackages(Trainee trainee) {
+    return _packageBox.values
+        .where((pck) => pck.traineeId == trainee.id)
+        .toList();
+  }
+
+  containUnusedSchedule(packageId) {
+    var count =
+        _scheduleBox.values
+            .where(
+              (sch) => sch.packageId == packageId && sch.isScheduleUnUsed(),
+            )
+            .toList()
+            .length;
+    return count > 2;
+  }
+
+  @override
+  List<UpcomingSession> getAllUpcomingSchedule() {
+    List<Schedule> schedules =
+        _scheduleBox.values
+            .where((schedule) => schedule.startTime.isAfter(DateTime.now()))
+            .toList();
+
+    schedules.sort((a, b) => a.startTime.compareTo(b.startTime));
+    List<Schedule> topSchedules =
+        (schedules.length > 5) ? schedules.sublist(0, 5) : schedules;
+    return _mapToUpcomigSessions(topSchedules);
+  }
+
+  List<UpcomingSession> _mapToUpcomigSessions(List<Schedule> topSchedules) {
+    return topSchedules.map((schedule) {
+      String scheduleTime =
+          istoday(schedule.startTime)
+              ? _todayDateFormat.format(schedule.startTime)
+              : _dateFormat.format(schedule.startTime);
+      String title =
+          _packageBox.values
+              .firstWhere((sch) => sch.id == schedule.packageId)
+              .name;
+
+      return UpcomingSession(
+        scheduleTime,
+        title,
+        "with ${schedule.trainer.name}",
+        [
+          schedule.trainee.imageUrl ?? schedule.trainee.name,
+          schedule.trainer.imageUrl ?? schedule.trainer.name,
+        ],
+      );
+    }).toList();
+  }
+
+  bool istoday(DateTime dateTime) {
+    DateTime today = DateTime.now();
+    return dateTime.year == today.year &&
+        dateTime.month == today.month &&
+        dateTime.day == today.day;
   }
 }

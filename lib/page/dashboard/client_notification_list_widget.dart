@@ -40,7 +40,7 @@ class ClientNotificationListWidget extends StatelessWidget {
           ),
           SizedBox(height: 20),
           ...clientList(clientEntries),
-          clientEntries.isEmpty
+          clientEntries.length < 5
               ? Container()
               : TextButton(
                 onPressed: () {},

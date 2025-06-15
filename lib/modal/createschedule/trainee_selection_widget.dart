@@ -77,7 +77,6 @@ class _TraineeSelectionWidgetState extends State<TraineeSelectionWidget> {
           bool isSelectedTrainee = selectedTrainee == trainees[index];
           return GestureDetector(
             onTap: () {
-              print("Calling  widget.onTraineeSelect and ${trainees[index]}");
               widget.onTraineeSelect(trainees[index]);
               setState(() {
                 selectedTrainee = trainees[index];
@@ -162,8 +161,7 @@ class _TraineeSelectionWidgetState extends State<TraineeSelectionWidget> {
               trainee: selectedTrainee!,
               onPackageSelect: (val) {
                 selectedPackage = val;
-                print('Selected Package: ${val.name}');
-                //widget.onPackageSelect(val);
+                widget.onPackageSelect(val);
               },
             ),
             SizedBox(height: 16),

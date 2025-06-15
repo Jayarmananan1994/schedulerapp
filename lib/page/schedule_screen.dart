@@ -8,6 +8,7 @@ import 'package:schedulerapp/component/month_day_selector.dart';
 import 'package:schedulerapp/component/schdeule_card.dart';
 import 'package:schedulerapp/entity/schedule.dart';
 import 'package:schedulerapp/service/storage_service.dart';
+import 'package:schedulerapp/util/dialog_util.dart';
 
 class ScheduleScreen extends StatefulWidget {
   const ScheduleScreen({super.key});
@@ -226,7 +227,6 @@ class _ScheduleScreenState extends State<ScheduleScreen>
   }
 
   _onDateSelected(DateTime date) {
-    print('Selected date: $date');
     setState(() {
       _selectedDay = date;
     });
@@ -258,6 +258,24 @@ class _ScheduleScreenState extends State<ScheduleScreen>
     //         defaultDateTime: _selectedDay ?? DateTime.now(),
     //       ),
     // );
+    if (_selectedDay!.isBefore(
+      DateTime.now().copyWith(
+        hour: 0,
+        minute: 0,
+        second: 0,
+        millisecond: 0,
+        microsecond: 0,
+      ),
+    )) {
+      showAppInfoDialog(
+        context,
+        "Error",
+        "Cannot schedule on past date",
+        "Ok",
+        true,
+      );
+      return;
+    }
     Navigator.of(context).push(
       CupertinoPageRoute(
         fullscreenDialog: true, // This is the key!

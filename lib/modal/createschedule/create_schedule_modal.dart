@@ -109,17 +109,14 @@ class _CreateScheduleModalState extends State<CreateScheduleModal> {
   }
 
   _onTrainerSelection(trainer) {
-    print('Selected Trainer');
-    selectedTrainer = trainer;
+    setState(() => selectedTrainer = trainer);
   }
 
   _onTraineeSelection(Trainee trainee) {
-    print('Selected Trainee ${trainee.name}');
     selectedTrainee = trainee;
   }
 
   _onPackageSelection(package) {
-    print('Selected Package: ${package.name}');
     selectedPackage = package;
   }
 

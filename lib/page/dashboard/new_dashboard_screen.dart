@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:schedulerapp/component/progress_bar.dart';
 import 'package:schedulerapp/constant.dart';
 import 'package:schedulerapp/page/dashboard/client_notification_list_widget.dart';
+import 'package:schedulerapp/page/dashboard/upcoming_session.dart';
 
 class NewDashboardScreen extends StatelessWidget {
   const NewDashboardScreen({super.key});
@@ -42,25 +43,6 @@ class NewDashboardScreen extends StatelessWidget {
     );
   }
 
-  content() {
-    return Expanded(
-      child: SingleChildScrollView(
-        child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 5),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // clientNotificationList(),
-              upcomingSessions(),
-              groupclass(),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
   contentIos() {
     return SingleChildScrollView(
       child: Container(
@@ -70,7 +52,8 @@ class NewDashboardScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ClientNotificationListWidget(),
-            upcomingSessions(),
+            //upcomingSessions(),
+            UpcomingSessionsWidget(),
             groupclass(),
           ],
         ),

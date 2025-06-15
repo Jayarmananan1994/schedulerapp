@@ -45,7 +45,6 @@ class DeleteScheduleWidget extends StatelessWidget {
       "Confirmation",
       "Are you sure you want to delete schedule list",
     ).then((val) async {
-      print(val);
       await _storageService.deleteAllSchedules();
       showAppInfoDialog(
         context,

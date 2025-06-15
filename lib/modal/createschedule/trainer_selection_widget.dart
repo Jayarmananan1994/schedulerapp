@@ -68,7 +68,6 @@ class _TrainerSelectionWidgetState extends State<TrainerSelectionWidget> {
               setState(() {
                 selectedTrainer = trainers[index];
               });
-              print('On select ${trainers[index]}');
               widget.onSelect(trainers[index]);
             },
             child: Container(

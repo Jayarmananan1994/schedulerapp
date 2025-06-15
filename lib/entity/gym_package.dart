@@ -31,4 +31,9 @@ class GymPackage extends HiveObject {
     await save();
     return this;
   }
+
+  @override
+  String toString() {
+    return 'GymPackage(name: $name, noOfSessions: $noOfSessions, cost: $cost, noOfSessionsAvailable: $noOfSessionsAvailable, traineeId: $traineeId)';
+  }
 }

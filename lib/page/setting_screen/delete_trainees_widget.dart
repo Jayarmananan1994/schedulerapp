@@ -45,10 +45,8 @@ class DeleteTraineesWidget extends StatelessWidget {
       "Confirmation",
       "Are you sure you want to delete trainee list and thier package ",
     ).then((val) async {
-      print(val);
       if (val) {
         int done = await _storageService.deleteAllTrainee();
-        print(done);
         showAppInfoDialog(
           context,
           'Done',

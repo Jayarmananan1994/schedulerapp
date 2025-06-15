@@ -7,12 +7,14 @@ import 'package:schedulerapp/entity/gym_package.dart';
 import 'package:schedulerapp/entity/schedule.dart';
 import 'package:schedulerapp/entity/staff.dart';
 import 'package:schedulerapp/entity/trainee.dart';
+import 'package:schedulerapp/entity/upcoming_session.dart';
 
 abstract class StorageService {
   Future<void> init();
   List<Schedule> getScheduleItems(DateTime date);
   Future<List<Staff>> getStaffList();
   Future<List<Schedule>> getUpcomingSchedule(Staff staff, DateTime date);
+  List<UpcomingSession> getAllUpcomingSchedule();
   Future<List<TraineeItemDetail>> getTraineeDetailList();
   Future<List<Trainee>> getTraineeList();
   Future<bool> saveScheduleItem(Schedule schedule);

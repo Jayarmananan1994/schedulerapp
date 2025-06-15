@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -46,7 +45,6 @@ class DeleteAllButtonWidget extends StatelessWidget {
       "Confirm Action",
       "Are you sure you want to proceed with this action?",
     ).then((val) async {
-      print(val);
       if (val) {
         await _storageService.deleteAllData();
         showAppInfoDialog(context, 'Done', 'All data cleared:', 'Ok', false);

@@ -218,7 +218,7 @@ class _MonthDaySelectorState extends State<MonthDaySelector> {
                   minimumDate: DateTime(2000),
                   maximumDate: DateTime(2035),
                   onDateTimeChanged: (DateTime newDate) {
-                    print('Selected date: $newDate');
+                    widget.onDateSelected(newDate);
                     // Update the selected date as the user scrolls
                     // setState(() {
                     //   _selectedDate = newDate;
@@ -229,7 +229,6 @@ class _MonthDaySelectorState extends State<MonthDaySelector> {
               CupertinoButton(
                 child: const Text('Done'),
                 onPressed: () {
-                  print('Selected date: ${widget.selectedDay}');
                   Navigator.of(context).pop();
                 },
               ),

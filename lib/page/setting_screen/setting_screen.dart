@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:schedulerapp/constant.dart';
 import 'package:schedulerapp/page/setting_screen/delete_all_button_widget.dart';
