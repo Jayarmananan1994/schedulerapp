@@ -21,6 +21,7 @@ class _StaffPayrollScreenState extends State<StaffPayrollScreen> {
 
   @override
   Widget build(BuildContext context) {
+    print('REbuild staff payroll');
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
         leading: Padding(
@@ -56,9 +57,13 @@ class _StaffPayrollScreenState extends State<StaffPayrollScreen> {
   contentIos() {
     List<StaffPayroll> staffPayroll =
         _storageService.getPayrollDetailsOfAllStaff();
-    double totalAmt = staffPayroll
-        .map((payroll) => payroll.dueAmount)
-        .reduce((a, b) => a + b);
+    print('Staff payroll : $staffPayroll');
+    double totalAmt =
+        staffPayroll.isEmpty
+            ? 0
+            : staffPayroll
+                .map((payroll) => payroll.dueAmount)
+                .reduce((a, b) => a + b);
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 16.0),

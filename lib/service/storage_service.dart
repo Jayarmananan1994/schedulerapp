@@ -20,7 +20,7 @@ abstract class StorageService {
   Future<bool> saveScheduleItem(Schedule schedule);
   Future<bool> saveTrainee(Trainee trainee);
   Future<bool> saveTrainer(Staff staff);
-  Future<bool> deleteStaff(Staff id);
+  Future<bool> deleteStaff(Staff staff);
   List<Schedule> getTraineePastSessions(String clientId);
   List<Schedule> getTraineeUpcomingSessions(String clientId);
   Future<bool> updateSchedule(Schedule schedule);

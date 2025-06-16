@@ -8,9 +8,16 @@ import 'package:schedulerapp/entity/staff.dart';
 import 'package:schedulerapp/modal/add_staff_modal.dart';
 import 'package:schedulerapp/page/gym_management/trainee_list_widget.dart';
 import 'package:schedulerapp/service/storage_service.dart';
+import 'package:schedulerapp/util/dialog_util.dart';
 
 class GymManagementScreen extends StatefulWidget {
-  const GymManagementScreen({super.key});
+  final Function? onStaffUpdate;
+  final Function? onTraineeUpdate;
+  const GymManagementScreen({
+    super.key,
+    this.onStaffUpdate,
+    this.onTraineeUpdate,
+  });
 
   @override
   State<GymManagementScreen> createState() => _GymManagementScreenState();
@@ -62,10 +69,12 @@ class _GymManagementScreenState extends State<GymManagementScreen> {
                     staffList(context),
                     SizedBox(height: 16),
                     TraineeListWidget(
-                      onTraineeAdded:
-                          () => setState(() {
-                            statsDetail = _storageService.getGymStats();
-                          }),
+                      onTraineeAdded: () {
+                        setState(() {
+                          statsDetail = _storageService.getGymStats();
+                        });
+                        widget.onTraineeUpdate!(true);
+                      },
                     ),
                   ],
                 ),
@@ -212,6 +221,9 @@ class _GymManagementScreenState extends State<GymManagementScreen> {
       setState(() {
         statsDetail = _storageService.getGymStats();
       });
+      if (widget.onStaffUpdate != null) {
+        widget.onStaffUpdate!(true);
+      }
     }
   }
 
@@ -276,7 +288,7 @@ class _GymManagementScreenState extends State<GymManagementScreen> {
                               height: 20,
                               child: IconButton(
                                 padding: EdgeInsets.all(0),
-                                onPressed: () {},
+                                onPressed: () => _deleteStaff(staff),
                                 icon: Icon(Icons.close, color: Colors.red),
                               ),
                             ),
@@ -317,5 +329,28 @@ class _GymManagementScreenState extends State<GymManagementScreen> {
         }
       },
     );
+  }
+
+  _deleteStaff(Staff staff) {
+    showAppConfirmationDialog(
+      context,
+      'Confirmation',
+      'Are you sure you want to delete ${staff.name}\'s record? Any schedule and history related to ${staff.name} will be removed.',
+    ).then((val) async {
+      if (val) {
+        await _storageService.deleteStaff(staff);
+        await showAppInfoDialog(
+          context,
+          'Staff Remove',
+          ' ${staff.name}\'s record is removed',
+          'Ok',
+          false,
+        );
+        setState(() {});
+        if (widget.onStaffUpdate != null) {
+          widget.onStaffUpdate!(true);
+        }
+      }
+    });
   }
 }

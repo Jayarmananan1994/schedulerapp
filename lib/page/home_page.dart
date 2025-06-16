@@ -5,16 +5,17 @@ import 'package:schedulerapp/page/payroll/staff_payroll_screen.dart';
 import 'package:schedulerapp/page/schedule_screen.dart';
 import 'package:schedulerapp/page/setting_screen/setting_screen.dart';
 
-class HomePage extends StatelessWidget {
-  final List<Widget> tabs = [
-    NewDashboardScreen(),
-    ScheduleScreen(),
-    StaffPayrollScreen(),
-    GymManagementScreen(),
-    SettingScreen(),
-  ];
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
 
-  HomePage({super.key});
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  int _currentIndex = 0;
+  Key _tabAKey = UniqueKey();
+  bool _shouldRefreshPayrollPage = false;
 
   @override
   Widget build(BuildContext context) {
@@ -22,10 +23,19 @@ class HomePage extends StatelessWidget {
       tabBuilder:
           (context, index) => CupertinoTabView(
             builder: (context) {
-              return tabs[index];
+              return getTabs()[index];
             },
           ),
       tabBar: CupertinoTabBar(
+        currentIndex: _currentIndex,
+        onTap: (index) {
+          _currentIndex = index;
+          print("current: $_currentIndex");
+          if (index == 0 && _shouldRefreshPayrollPage) {
+            _tabAKey = UniqueKey();
+            _shouldRefreshPayrollPage = false;
+          }
+        },
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(CupertinoIcons.home),
@@ -50,5 +60,22 @@ class HomePage extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  getTabs() {
+    return [
+      NewDashboardScreen(),
+      ScheduleScreen(),
+      StaffPayrollScreen(key: _tabAKey),
+      GymManagementScreen(
+        onStaffUpdate: (isUpdated) {
+          _shouldRefreshPayrollPage = isUpdated;
+        },
+        onTraineeUpdate: (isupdated) {
+          _shouldRefreshPayrollPage = isupdated;
+        },
+      ),
+      SettingScreen(),
+    ];
   }
 }

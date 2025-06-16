@@ -39,13 +39,13 @@ class DeleteTrainerWidget extends StatelessWidget {
     showAppConfirmationDialog(
       context,
       "Confirmation",
-      "Are you sure you want to delete trainer list",
+      "Are you sure you want to delete every trainers record? It will also remove all schedules associated",
     ).then((val) async {
       await _storageService.deleteAllStaff();
       showAppInfoDialog(
         context,
         'Done',
-        'All Trainers data cleared',
+        'All Trainers ans schedule data cleared',
         'Ok',
         false,
       );

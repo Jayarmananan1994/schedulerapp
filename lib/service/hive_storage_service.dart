@@ -66,6 +66,14 @@ class HiveStorageService implements StorageService {
       return Future.value(false);
     }
     await staff.delete();
+    List scheduleKeys =
+        _scheduleBox
+            .toMap()
+            .entries
+            .where((entry) => entry.value.id == staff.id)
+            .map((entry) => entry.key)
+            .toList();
+    await _scheduleBox.deleteAll(scheduleKeys);
     return Future.value(true);
   }
 
@@ -362,8 +370,12 @@ class HiveStorageService implements StorageService {
   }
 
   @override
-  Future<int> deleteAllStaff() {
-    return _staffBox.clear();
+  Future<int> deleteAllStaff() async {
+    var response = await Future.wait([
+      _traineeBox.clear(),
+      _scheduleBox.clear(),
+    ]);
+    return response[0];
   }
 
   @override
