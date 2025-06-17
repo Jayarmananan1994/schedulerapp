@@ -1,10 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import 'package:schedulerapp/constant.dart';
 import 'package:schedulerapp/entity/staff.dart';
-import 'package:schedulerapp/service/storage_service.dart';
+import 'package:schedulerapp/provider/staff_provider.dart';
 
 class AddStaffModal extends StatefulWidget {
   const AddStaffModal({super.key});
@@ -18,8 +18,6 @@ class _AddStaffModalState extends State<AddStaffModal> {
   final _priceController = TextEditingController();
   final _roleController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  final StorageService _storageService = GetIt.I<StorageService>();
-
   String? _nameError;
   String? _priceError;
   String? _selectedAvatar = trainerAvatarImageUrls.first;
@@ -232,8 +230,10 @@ class _AddStaffModalState extends State<AddStaffModal> {
         role: _roleController.text,
         imageUrl: _selectedAvatar,
       );
-      _storageService
-          .saveTrainer(newStaff)
+
+      context
+          .read<StaffProvider>()
+          .addStaff(newStaff)
           .then((value) async {
             await showCupertinoDialog(
               context: context,

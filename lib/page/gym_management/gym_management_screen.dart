@@ -2,13 +2,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import 'package:schedulerapp/constant.dart';
 import 'package:schedulerapp/dto/gym_stats.dart';
-import 'package:schedulerapp/entity/staff.dart';
-import 'package:schedulerapp/modal/add_staff_modal.dart';
 import 'package:schedulerapp/page/gym_management/trainee_list_widget.dart';
+import 'package:schedulerapp/page/gym_management/staff_list_widget.dart';
+import 'package:schedulerapp/provider/staff_provider.dart';
 import 'package:schedulerapp/service/storage_service.dart';
-import 'package:schedulerapp/util/dialog_util.dart';
 
 class GymManagementScreen extends StatefulWidget {
   final Function? onStaffUpdate;
@@ -31,6 +31,7 @@ class _GymManagementScreenState extends State<GymManagementScreen> {
   @override
   void initState() {
     statsDetail = _storageService.getGymStats();
+    Provider.of<StaffProvider>(context, listen: false).getStaffList();
     super.initState();
   }
 
@@ -66,7 +67,13 @@ class _GymManagementScreenState extends State<GymManagementScreen> {
                   children: [
                     stats(),
                     SizedBox(height: 16),
-                    staffList(context),
+                    StaffListWidget(
+                      onStaffDeleted: (value) {
+                        setState(() {
+                          statsDetail = _storageService.getGymStats();
+                        });
+                      },
+                    ),
                     SizedBox(height: 16),
                     TraineeListWidget(
                       onTraineeAdded: () {
@@ -158,199 +165,5 @@ class _GymManagementScreenState extends State<GymManagementScreen> {
         ],
       ),
     );
-  }
-
-  staffList(context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Staff Members',
-                style: GoogleFonts.inter(
-                  color: colorblack,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              SizedBox(
-                width: 120,
-                child: TextButton(
-                  style: TextButton.styleFrom(
-                    backgroundColor: colorBlue,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20), // Rounded edges,
-                    ),
-                  ),
-                  onPressed: () => _showAddStaffPage(context),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.add, color: Colors.white),
-                      Text(
-                        'Add Staff',
-                        style: GoogleFonts.inter(
-                          fontSize: 14,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 16),
-          _staffList(),
-        ],
-      ),
-    );
-  }
-
-  _showAddStaffPage(BuildContext context) async {
-    bool isCreated = await Navigator.of(context).push(
-      CupertinoPageRoute(
-        fullscreenDialog: true,
-        builder: (context) => AddStaffModal(),
-      ),
-    );
-    if (isCreated) {
-      setState(() {
-        statsDetail = _storageService.getGymStats();
-      });
-      if (widget.onStaffUpdate != null) {
-        widget.onStaffUpdate!(true);
-      }
-    }
-  }
-
-  _staffList() {
-    return FutureBuilder<List<Staff>>(
-      future: _storageService.getStaffList(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasError) {
-          return SizedBox(
-            height: 180,
-            child: Center(child: Text('Error: ${snapshot.error}')),
-          );
-        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return SizedBox(
-            height: 160,
-            child: Center(
-              child: Text(
-                'No staff available.',
-                style: GoogleFonts.inter(fontSize: 16, color: colorGreyTwo),
-              ),
-            ),
-          );
-        } else {
-          var list = snapshot.data!;
-          return SizedBox(
-            height: 180,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              itemBuilder: (context, index) {
-                var staff = list[index];
-                return Container(
-                  width: 220,
-                  height: 160,
-                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 8),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: colorShadowGrey,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.max,
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            SizedBox(
-                              width: 60,
-                              height: 60,
-                              child: CircleAvatar(
-                                radius: 24,
-                                backgroundImage: AssetImage(staff.imageUrl!),
-                              ),
-                            ),
-                            SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: IconButton(
-                                padding: EdgeInsets.all(0),
-                                onPressed: () => _deleteStaff(staff),
-                                icon: Icon(Icons.close, color: Colors.red),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: 10),
-                      Text(
-                        staff.name,
-                        style: GoogleFonts.inter(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: colorblack,
-                        ),
-                      ),
-                      Text(
-                        'Head Trainer',
-                        style: GoogleFonts.inter(
-                          fontSize: 14,
-                          color: colorGreyTwo,
-                        ),
-                      ),
-                      Text(
-                        '\$${staff.payRate}/h',
-                        style: GoogleFonts.inter(
-                          fontSize: 14,
-                          color: colorGreyTwo,
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              },
-              separatorBuilder: (context, index) => SizedBox(width: 10),
-              itemCount: list.length,
-            ),
-          );
-        }
-      },
-    );
-  }
-
-  _deleteStaff(Staff staff) {
-    showAppConfirmationDialog(
-      context,
-      'Confirmation',
-      'Are you sure you want to delete ${staff.name}\'s record? Any schedule and history related to ${staff.name} will be removed.',
-    ).then((val) async {
-      if (val) {
-        await _storageService.deleteStaff(staff);
-        await showAppInfoDialog(
-          context,
-          'Staff Remove',
-          ' ${staff.name}\'s record is removed',
-          'Ok',
-          false,
-        );
-        setState(() {});
-        if (widget.onStaffUpdate != null) {
-          widget.onStaffUpdate!(true);
-        }
-      }
-    });
   }
 }

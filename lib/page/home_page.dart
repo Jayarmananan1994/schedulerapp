@@ -30,7 +30,6 @@ class _HomePageState extends State<HomePage> {
         currentIndex: _currentIndex,
         onTap: (index) {
           _currentIndex = index;
-          print("current: $_currentIndex");
           if (index == 0 && _shouldRefreshPayrollPage) {
             _tabAKey = UniqueKey();
             _shouldRefreshPayrollPage = false;
