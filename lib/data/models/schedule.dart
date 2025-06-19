@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/adapters.dart';
-import 'package:schedulerapp/entity/trainee.dart';
-import 'package:schedulerapp/entity/staff.dart';
+import 'package:schedulerapp/data/models/trainee.dart';
+import 'package:schedulerapp/data/models/trainer.dart';
 import 'package:schedulerapp/util/app_util.dart';
-
 part 'schedule.g.dart';
 
 @HiveType(typeId: 0)
@@ -19,7 +18,7 @@ class Schedule extends HiveObject {
   @HiveField(4)
   final Trainee trainee;
   @HiveField(5)
-  final Staff trainer;
+  final Trainer trainer;
   @HiveField(6)
   final String meetingnote;
   @HiveField(7)
@@ -56,7 +55,7 @@ class Schedule extends HiveObject {
 
   @override
   String toString() {
-    return 'ScheduleItem(title: $title, startTime: $startTime, endTime: $endTime, client: ${trainee.name}, staff: ${trainer.name}, meetingnote: $meetingnote)';
+    return 'ScheduleItem(title: $title, startTime: $startTime, endTime: $endTime, client: ${trainee.name}, trainer: ${trainer.name}, meetingnote: $meetingnote)';
   }
 
   bool isLapsedSchedule() {
@@ -85,7 +84,7 @@ class Schedule extends HiveObject {
 
   Schedule copyWith({
     required DateTime startTime,
-    required Staff trainer,
+    required Trainer trainer,
     required Trainee trainee,
   }) {
     return Schedule(

@@ -1,37 +1,37 @@
 import 'package:flutter/material.dart';
+import 'package:schedulerapp/data/models/gym_package.dart';
+import 'package:schedulerapp/data/models/schedule.dart';
+import 'package:schedulerapp/data/models/trainee.dart';
+import 'package:schedulerapp/data/models/trainer.dart';
 import 'package:schedulerapp/dto/expiring_client_session.dart';
 import 'package:schedulerapp/dto/gym_stats.dart';
 import 'package:schedulerapp/dto/staff_payroll.dart';
 import 'package:schedulerapp/dto/trainee_item_detail.dart';
-import 'package:schedulerapp/entity/gym_package.dart';
-import 'package:schedulerapp/entity/schedule.dart';
-import 'package:schedulerapp/entity/staff.dart';
-import 'package:schedulerapp/entity/trainee.dart';
 import 'package:schedulerapp/entity/upcoming_session.dart';
 
 abstract class StorageService {
   Future<void> init();
   List<Schedule> getScheduleItems(DateTime date);
-  Future<List<Staff>> getStaffList();
-  Future<List<Schedule>> getUpcomingSchedule(Staff staff, DateTime date);
+  Future<List<Trainer>> getTrainerList();
+  Future<List<Schedule>> getUpcomingSchedule(Trainer staff, DateTime date);
   List<UpcomingSession> getAllUpcomingSchedule();
   Future<List<TraineeItemDetail>> getTraineeDetailList();
   Future<List<Trainee>> getTraineeList();
   Future<bool> saveScheduleItem(Schedule schedule);
   Future<bool> saveTrainee(Trainee trainee);
-  Future<bool> saveTrainer(Staff staff);
-  Future<bool> deleteStaff(Staff staff);
+  Future<bool> saveTrainer(Trainer staff);
+  Future<bool> deleteStaff(Trainer staff);
   List<Schedule> getTraineePastSessions(String clientId);
   List<Schedule> getTraineeUpcomingSessions(String clientId);
   Future<bool> updateSchedule(Schedule schedule);
   int getCountOfPastSessionsByTrainer(
-    Staff staff,
+    Trainer staff,
     DateTime startOfMonth,
     DateTime endOfMonth,
   );
   int getCountOfPendingSessionsForTrainee(Trainee trainee);
   List<TimeOfDay> fetchBookedTimeForStaffByDate(
-    Staff selectedTrainer,
+    Trainer selectedTrainer,
     DateTime currentSelectedDate,
   );
 

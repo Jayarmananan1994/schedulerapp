@@ -6,16 +6,16 @@ import 'package:provider/provider.dart';
 import 'package:schedulerapp/constant.dart';
 import 'package:schedulerapp/dto/gym_stats.dart';
 import 'package:schedulerapp/page/gym_management/trainee_list_widget.dart';
-import 'package:schedulerapp/page/gym_management/staff_list_widget.dart';
-import 'package:schedulerapp/provider/staff_provider.dart';
+import 'package:schedulerapp/page/gym_management/trainer_list_widget.dart';
+import 'package:schedulerapp/provider/trainer_provider.dart';
 import 'package:schedulerapp/service/storage_service.dart';
 
 class GymManagementScreen extends StatefulWidget {
-  final Function? onStaffUpdate;
+  final Function? onTrainerUpdate;
   final Function? onTraineeUpdate;
   const GymManagementScreen({
     super.key,
-    this.onStaffUpdate,
+    this.onTrainerUpdate,
     this.onTraineeUpdate,
   });
 
@@ -31,7 +31,7 @@ class _GymManagementScreenState extends State<GymManagementScreen> {
   @override
   void initState() {
     statsDetail = _storageService.getGymStats();
-    Provider.of<StaffProvider>(context, listen: false).getStaffList();
+    Provider.of<TrainerProvider>(context, listen: false).getTrainerList();
     super.initState();
   }
 
@@ -67,8 +67,8 @@ class _GymManagementScreenState extends State<GymManagementScreen> {
                   children: [
                     stats(),
                     SizedBox(height: 16),
-                    StaffListWidget(
-                      onStaffDeleted: (value) {
+                    TrainerListWidget(
+                      onTrainerDeleted: (value) {
                         setState(() {
                           statsDetail = _storageService.getGymStats();
                         });

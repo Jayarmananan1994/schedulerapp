@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:schedulerapp/constant.dart';
-import 'package:schedulerapp/entity/gym_package.dart';
-import 'package:schedulerapp/entity/trainee.dart';
+import 'package:schedulerapp/data/models/gym_package.dart';
+import 'package:schedulerapp/data/models/trainee.dart';
 
 import 'package:schedulerapp/service/storage_service.dart';
 
@@ -129,7 +129,7 @@ class _AddClientModalState extends State<AddClientModal> {
   }
 
   _trainingPackageList() {
-    var packages = [GymPackage('', 'Custom Package', 0, 0.0, 0, 'traineeId')];
+    var packages = [GymPackage('', 'New Package', 0, 0.0, 0, 'traineeId')];
     packages.addAll(_storageService.getPackageList());
 
     return SizedBox(
@@ -243,11 +243,10 @@ class _AddClientModalState extends State<AddClientModal> {
       final name = _nameController.text;
 
       var newTrainee = Trainee(
-        id: UniqueKey().toString(),
-        name: name,
-        imageUrl: _selectedAvatar,
-        feePerSession: 0,
-        sessionsLeft: 0,
+        UniqueKey().toString(),
+        name,
+        _selectedAvatar,
+        0,
       );
       await _storageService.saveTrainee(newTrainee);
       await _storageService.addNewPackageToTrainee(

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:intl/intl.dart';
-import 'package:schedulerapp/entity/schedule.dart';
-import 'package:schedulerapp/entity/staff.dart';
-import 'package:schedulerapp/entity/trainee.dart';
+import 'package:schedulerapp/data/models/schedule.dart';
+import 'package:schedulerapp/data/models/trainee.dart';
+import 'package:schedulerapp/data/models/trainer.dart';
 import 'package:schedulerapp/service/storage_service.dart';
 
 class ScheduleEditDetailModal extends StatefulWidget {
@@ -18,7 +18,7 @@ class ScheduleEditDetailModal extends StatefulWidget {
 class _ScheduleEditDetailModalState extends State<ScheduleEditDetailModal> {
   bool _isChanged = false;
   final _storageService = GetIt.I<StorageService>();
-  late Staff selectedTrainer;
+  late Trainer selectedTrainer;
   late Trainee selectedTrainee;
   late DateTime selectedDate;
   late TimeOfDay selectedTime;
@@ -149,18 +149,18 @@ class _ScheduleEditDetailModalState extends State<ScheduleEditDetailModal> {
   trainerDropDown() {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: FutureBuilder<List<Staff>>(
-        future: _storageService.getStaffList(),
+      child: FutureBuilder<List<Trainer>>(
+        future: _storageService.getTrainerList(),
         builder: (context, snapshot) {
-          return DropdownButtonFormField<Staff>(
+          return DropdownButtonFormField<Trainer>(
             value: snapshot.hasData ? selectedTrainer : null,
             items:
                 (snapshot.hasData)
                     ? snapshot.data!
                         .map(
-                          (staff) => DropdownMenuItem(
-                            value: staff,
-                            child: Text(staff.name),
+                          (trainer) => DropdownMenuItem(
+                            value: trainer,
+                            child: Text(trainer.name),
                           ),
                         )
                         .toList()

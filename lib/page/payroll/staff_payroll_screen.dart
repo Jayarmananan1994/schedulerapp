@@ -26,7 +26,7 @@ class _StaffPayrollScreenState extends State<StaffPayrollScreen> {
         leading: Padding(
           padding: const EdgeInsets.only(top: 8.0),
           child: Text(
-            'Staff Payroll',
+            'Trainer Payroll',
             style: GoogleFonts.inter(
               fontWeight: FontWeight.w600,
               fontSize: 24,

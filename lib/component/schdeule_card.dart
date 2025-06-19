@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:schedulerapp/component/schedule_edit_detail_modal.dart';
-import 'package:schedulerapp/entity/schedule.dart';
+import 'package:schedulerapp/data/models/schedule.dart';
 
 class SchdeuleCard extends StatelessWidget {
   final Schedule scheduleItem;

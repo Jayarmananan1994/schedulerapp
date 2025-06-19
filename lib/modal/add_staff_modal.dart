@@ -3,17 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:schedulerapp/constant.dart';
-import 'package:schedulerapp/entity/staff.dart';
-import 'package:schedulerapp/provider/staff_provider.dart';
+import 'package:schedulerapp/data/models/trainer.dart';
+import 'package:schedulerapp/provider/trainer_provider.dart';
 
-class AddStaffModal extends StatefulWidget {
-  const AddStaffModal({super.key});
+class AddTrainerModal extends StatefulWidget {
+  const AddTrainerModal({super.key});
 
   @override
-  State<AddStaffModal> createState() => _AddStaffModalState();
+  State<AddTrainerModal> createState() => _AddTrainerModalState();
 }
 
-class _AddStaffModalState extends State<AddStaffModal> {
+class _AddTrainerModalState extends State<AddTrainerModal> {
   final _nameController = TextEditingController();
   final _priceController = TextEditingController();
   final _roleController = TextEditingController();
@@ -223,17 +223,17 @@ class _AddStaffModalState extends State<AddStaffModal> {
     if (_formValidate()) {
       final name = _nameController.text;
       final price = _priceController.text;
-      var newStaff = Staff(
-        id: UniqueKey().toString(),
-        name: name,
-        payRate: double.parse(price),
-        role: _roleController.text,
-        imageUrl: _selectedAvatar,
+      var newTrainer = Trainer(
+        UniqueKey().toString(),
+        name,
+        double.parse(price),
+        _selectedAvatar,
+        _roleController.text,
       );
 
       context
-          .read<StaffProvider>()
-          .addStaff(newStaff)
+          .read<TrainerProvider>()
+          .addStaff(newTrainer)
           .then((value) async {
             await showCupertinoDialog(
               context: context,

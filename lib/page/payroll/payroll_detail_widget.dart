@@ -31,8 +31,8 @@ class PayrollDetailWidget extends StatelessWidget {
       width: 48,
       height: 48,
       child: GoGymAvatar(
-        imageUrl: staffPayroll.staff.imageUrl,
-        text: staffPayroll.staff.name[0].toUpperCase(),
+        imageUrl: staffPayroll.trainer.imageUrl,
+        text: staffPayroll.trainer.name[0].toUpperCase(),
       ),
     );
   }
@@ -67,7 +67,7 @@ class PayrollDetailWidget extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              staffPayroll.staff.name,
+              staffPayroll.trainer.name,
               style: GoogleFonts.inter(
                 fontWeight: FontWeight.w600,
                 fontSize: 16,
@@ -75,7 +75,7 @@ class PayrollDetailWidget extends StatelessWidget {
               ),
             ),
             Text(
-              staffPayroll.staff.role ?? 'Instructor',
+              staffPayroll.trainer.role ?? 'Instructor',
               style: GoogleFonts.inter(fontSize: 14, color: colorgrey),
             ),
           ],

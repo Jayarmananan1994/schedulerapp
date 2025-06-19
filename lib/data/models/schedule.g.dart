@@ -22,7 +22,7 @@ class ScheduleAdapter extends TypeAdapter<Schedule> {
       startTime: fields[2] as DateTime,
       endTime: fields[3] as DateTime,
       trainee: fields[4] as Trainee,
-      trainer: fields[5] as Staff,
+      trainer: fields[5] as Trainer,
       meetingnote: fields[6] as String,
       location: fields[7] as String?,
       traineeFee: fields[8] as double,

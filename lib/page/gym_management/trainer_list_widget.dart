@@ -3,15 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:schedulerapp/constant.dart';
-import 'package:schedulerapp/entity/staff.dart';
+import 'package:schedulerapp/data/models/trainer.dart';
 import 'package:schedulerapp/modal/add_staff_modal.dart';
-import 'package:schedulerapp/provider/staff_provider.dart';
+import 'package:schedulerapp/provider/trainer_provider.dart';
 import 'package:schedulerapp/util/dialog_util.dart';
 
-class StaffListWidget extends StatelessWidget {
-  final Function? onStaffDeleted;
+class TrainerListWidget extends StatelessWidget {
+  final Function? onTrainerDeleted;
 
-  const StaffListWidget({super.key, this.onStaffDeleted});
+  const TrainerListWidget({super.key, this.onTrainerDeleted});
 
   @override
   Widget build(BuildContext context) {
@@ -65,9 +65,9 @@ class StaffListWidget extends StatelessWidget {
   }
 
   Widget _buildStaffList() {
-    return Consumer<StaffProvider>(
+    return Consumer<TrainerProvider>(
       builder: (context, staffProvider, child) {
-        var list = staffProvider.staffList;
+        var list = staffProvider.trainerList;
 
         if (list == null) {
           return Center(child: CircularProgressIndicator());
@@ -165,14 +165,14 @@ class StaffListWidget extends StatelessWidget {
     );
   }
 
-  _deleteStaff(BuildContext context, Staff staff) {
+  _deleteStaff(BuildContext context, Trainer staff) {
     showAppConfirmationDialog(
       context,
       'Confirmation',
       'Are you sure you want to delete ${staff.name}\'s record? Any schedule and history related to ${staff.name} will be removed.',
     ).then((val) async {
       if (val) {
-        await Provider.of<StaffProvider>(
+        await Provider.of<TrainerProvider>(
           context,
           listen: false,
         ).deleteStaff(staff);
@@ -183,8 +183,8 @@ class StaffListWidget extends StatelessWidget {
           'Ok',
           false,
         );
-        if (onStaffDeleted != null) {
-          onStaffDeleted!(true);
+        if (onTrainerDeleted != null) {
+          onTrainerDeleted!(true);
         }
       }
     });
@@ -194,12 +194,12 @@ class StaffListWidget extends StatelessWidget {
     bool isCreated = await Navigator.of(context).push(
       CupertinoPageRoute(
         fullscreenDialog: true,
-        builder: (context) => AddStaffModal(),
+        builder: (context) => AddTrainerModal(),
       ),
     );
     if (isCreated) {
-      if (onStaffDeleted != null) {
-        onStaffDeleted!(true);
+      if (onTrainerDeleted != null) {
+        onTrainerDeleted!(true);
       }
     }
   }

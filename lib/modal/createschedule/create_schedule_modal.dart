@@ -5,10 +5,10 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:schedulerapp/component/date_time_selector.dart';
 import 'package:schedulerapp/constant.dart';
-import 'package:schedulerapp/entity/gym_package.dart';
-import 'package:schedulerapp/entity/schedule.dart';
-import 'package:schedulerapp/entity/staff.dart';
-import 'package:schedulerapp/entity/trainee.dart';
+import 'package:schedulerapp/data/models/gym_package.dart';
+import 'package:schedulerapp/data/models/schedule.dart';
+import 'package:schedulerapp/data/models/trainee.dart';
+import 'package:schedulerapp/data/models/trainer.dart';
 import 'package:schedulerapp/modal/createschedule/trainee_selection_widget.dart';
 import 'package:schedulerapp/modal/createschedule/trainer_selection_widget.dart';
 import 'package:schedulerapp/service/storage_service.dart';
@@ -25,7 +25,7 @@ class CreateScheduleModal extends StatefulWidget {
 class _CreateScheduleModalState extends State<CreateScheduleModal> {
   TimeOfDay? selectedTime;
   Trainee? selectedTrainee;
-  Staff? selectedTrainer;
+  Trainer? selectedTrainer;
   List<DateTime> selectedDates = [];
   GymPackage? selectedPackage;
   DateFormat dateFormat = DateFormat('yyyy-MM-dd');

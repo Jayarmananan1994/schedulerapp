@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart' as path_provider;
+import 'package:schedulerapp/data/models/gym_package.dart';
+import 'package:schedulerapp/data/models/schedule.dart';
+import 'package:schedulerapp/data/models/trainee.dart';
+import 'package:schedulerapp/data/models/trainer.dart';
 import 'package:schedulerapp/dto/expiring_client_session.dart';
 import 'package:schedulerapp/dto/gym_stats.dart';
 
@@ -9,10 +13,6 @@ import 'package:schedulerapp/dto/staff_payroll.dart';
 import 'package:schedulerapp/dto/trainee_item_detail.dart';
 import 'package:schedulerapp/entity/upcoming_session.dart';
 import 'package:schedulerapp/exception/schdule_conflict_exception.dart';
-import 'package:schedulerapp/entity/gym_package.dart';
-import 'package:schedulerapp/entity/schedule.dart';
-import 'package:schedulerapp/entity/staff.dart';
-import 'package:schedulerapp/entity/trainee.dart';
 import 'package:schedulerapp/service/storage_service.dart';
 import 'package:schedulerapp/util/app_util.dart';
 import 'package:collection/collection.dart';
@@ -20,7 +20,7 @@ import 'package:collection/collection.dart';
 class HiveStorageService implements StorageService {
   final DateFormat _todayDateFormat = DateFormat('hh:mm a');
   final DateFormat _dateFormat = DateFormat('dd MMM hh:mm');
-  late Box<Staff> _staffBox;
+  late Box<Trainer> _staffBox;
   late Box<Trainee> _traineeBox;
   late Box<Schedule> _scheduleBox;
   late Box<GymPackage> _packageBox;
@@ -32,10 +32,10 @@ class HiveStorageService implements StorageService {
       Hive.init(dbDir.path);
       await Hive.initFlutter();
       Hive.registerAdapter(TraineeAdapter());
-      Hive.registerAdapter(StaffAdapter());
+      Hive.registerAdapter(TrainerAdapter());
       Hive.registerAdapter(ScheduleAdapter());
       Hive.registerAdapter(GymPackageAdapter());
-      _staffBox = await Hive.openBox<Staff>('staffBox');
+      _staffBox = await Hive.openBox<Trainer>('staffBox');
       _traineeBox = await Hive.openBox<Trainee>('traineeBox');
       _scheduleBox = await Hive.openBox<Schedule>('scheduleBox');
       _packageBox = await Hive.openBox<GymPackage>('packageBox');
@@ -56,12 +56,12 @@ class HiveStorageService implements StorageService {
   }
 
   @override
-  Future<List<Staff>> getStaffList() {
+  Future<List<Trainer>> getTrainerList() {
     return Future.value(_staffBox.values.toList());
   }
 
   @override
-  Future<bool> deleteStaff(Staff staff) async {
+  Future<bool> deleteStaff(Trainer staff) async {
     if (!_staffBox.isOpen) {
       return Future.value(false);
     }
@@ -78,11 +78,14 @@ class HiveStorageService implements StorageService {
   }
 
   @override
-  Future<List<Schedule>> getUpcomingSchedule(Staff staff, DateTime date) async {
+  Future<List<Schedule>> getUpcomingSchedule(
+    Trainer staff,
+    DateTime date,
+  ) async {
     return Future.value(_getUpcomingSchedule(staff, date));
   }
 
-  List<Schedule> _getUpcomingSchedule(Staff staff, DateTime date) {
+  List<Schedule> _getUpcomingSchedule(Trainer staff, DateTime date) {
     return _scheduleBox.values
         .where(
           (schedule) =>
@@ -92,7 +95,7 @@ class HiveStorageService implements StorageService {
         .toList();
   }
 
-  List<Schedule> _getCompletedSessionForLastMonth(Staff staff) {
+  List<Schedule> _getCompletedSessionForLastMonth(Trainer staff) {
     return _scheduleBox.values
         .where(
           (schedule) =>
@@ -103,7 +106,7 @@ class HiveStorageService implements StorageService {
         .toList();
   }
 
-  List<Schedule> _getCurrentMonthCompletedSession(Staff staff) {
+  List<Schedule> _getCurrentMonthCompletedSession(Trainer staff) {
     return _scheduleBox.values
         .where(
           (schedule) =>
@@ -114,7 +117,7 @@ class HiveStorageService implements StorageService {
         .toList();
   }
 
-  List<Schedule> _getCurrentMonthUpcomingSessions(Staff staff) {
+  List<Schedule> _getCurrentMonthUpcomingSessions(Trainer staff) {
     return _scheduleBox.values
         .where(
           (schedule) =>
@@ -155,7 +158,7 @@ class HiveStorageService implements StorageService {
   }
 
   @override
-  Future<bool> saveTrainer(Staff staff) async {
+  Future<bool> saveTrainer(Trainer staff) async {
     if (!_staffBox.isOpen) {
       return Future.value(false);
     }
@@ -215,7 +218,7 @@ class HiveStorageService implements StorageService {
 
   @override
   int getCountOfPastSessionsByTrainer(
-    Staff staff,
+    Trainer staff,
     DateTime startOfMonth,
     DateTime endOfMonth,
   ) {
@@ -242,7 +245,7 @@ class HiveStorageService implements StorageService {
 
   @override
   List<TimeOfDay> fetchBookedTimeForStaffByDate(
-    Staff selectedTrainer,
+    Trainer selectedTrainer,
     DateTime currentSelectedDate,
   ) {
     return _scheduleBox.values
@@ -349,7 +352,7 @@ class HiveStorageService implements StorageService {
       var lastMonthCompletedSessions = _getCompletedSessionForLastMonth(staff);
       var currentUpcomingSessions = _getCurrentMonthUpcomingSessions(staff);
       return StaffPayroll(
-        staff: staff,
+        trainer: staff,
         sessionCompleted: currentCompletedSessions.length,
         upcomingSessionCount: currentUpcomingSessions.length,
         lastPaidDate: DateTime.now().subtract(Duration(days: 30)),

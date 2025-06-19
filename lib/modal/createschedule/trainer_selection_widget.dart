@@ -3,7 +3,7 @@ import 'package:get_it/get_it.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:schedulerapp/component/gogym_avatar.dart';
 import 'package:schedulerapp/constant.dart';
-import 'package:schedulerapp/entity/staff.dart';
+import 'package:schedulerapp/data/models/trainer.dart';
 import 'package:schedulerapp/service/storage_service.dart';
 
 class TrainerSelectionWidget extends StatefulWidget {
@@ -15,7 +15,7 @@ class TrainerSelectionWidget extends StatefulWidget {
 }
 
 class _TrainerSelectionWidgetState extends State<TrainerSelectionWidget> {
-  Staff? selectedTrainer;
+  Trainer? selectedTrainer;
   final StorageService _storageService = GetIt.I<StorageService>();
 
   @override
@@ -33,8 +33,8 @@ class _TrainerSelectionWidgetState extends State<TrainerSelectionWidget> {
           ),
         ),
         SizedBox(height: 16),
-        FutureBuilder<List<Staff>>(
-          future: _storageService.getStaffList(),
+        FutureBuilder<List<Trainer>>(
+          future: _storageService.getTrainerList(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
@@ -55,7 +55,7 @@ class _TrainerSelectionWidgetState extends State<TrainerSelectionWidget> {
     );
   }
 
-  _trainerList(List<Staff> trainers) {
+  _trainerList(List<Trainer> trainers) {
     return SizedBox(
       height: 114,
       width: double.infinity,

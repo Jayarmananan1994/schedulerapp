@@ -4,7 +4,7 @@ import 'package:get_it/get_it.dart';
 import 'package:schedulerapp/component/add_package_dialog.dart';
 import 'package:schedulerapp/component/client_schedule_history_list.dart';
 import 'package:schedulerapp/component/client_upcoming_schedules_list.dart';
-import 'package:schedulerapp/entity/trainee.dart';
+import 'package:schedulerapp/data/models/trainee.dart';
 import 'package:schedulerapp/service/storage_service.dart';
 
 class ClientDetailModal extends StatefulWidget {

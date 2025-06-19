@@ -67,7 +67,7 @@ class _HomePageState extends State<HomePage> {
       ScheduleScreen(),
       StaffPayrollScreen(key: _tabAKey),
       GymManagementScreen(
-        onStaffUpdate: (isUpdated) {
+        onTrainerUpdate: (isUpdated) {
           _shouldRefreshPayrollPage = isUpdated;
         },
         onTraineeUpdate: (isupdated) {

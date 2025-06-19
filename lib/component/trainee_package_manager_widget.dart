@@ -4,8 +4,8 @@ import 'package:get_it/get_it.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:schedulerapp/component/add_package_dialog.dart';
 import 'package:schedulerapp/constant.dart';
-import 'package:schedulerapp/entity/gym_package.dart';
-import 'package:schedulerapp/entity/trainee.dart';
+import 'package:schedulerapp/data/models/gym_package.dart';
+import 'package:schedulerapp/data/models/trainee.dart';
 import 'package:schedulerapp/service/storage_service.dart';
 
 class TraineePackageManagerWidget extends StatefulWidget {

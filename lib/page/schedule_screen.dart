@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:schedulerapp/constant.dart';
+import 'package:schedulerapp/data/models/schedule.dart';
 import 'package:schedulerapp/modal/createschedule/create_schedule_modal.dart';
 import 'package:schedulerapp/component/month_day_selector.dart';
 import 'package:schedulerapp/component/schdeule_card.dart';
-import 'package:schedulerapp/entity/schedule.dart';
 import 'package:schedulerapp/service/storage_service.dart';
 import 'package:schedulerapp/util/dialog_util.dart';
 

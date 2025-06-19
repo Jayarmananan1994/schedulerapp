@@ -90,7 +90,7 @@ class DashboardScreen extends StatelessWidget {
 
   _otherScheduleStats(width) {
     int countOfClients = _storageService.getNoOfActiveClients();
-    int noOfStaffs = _storageService.getNoOfTrainers();
+    int noOfTrainers = _storageService.getNoOfTrainers();
     return Column(
       children: [
         SizedBox(
@@ -121,7 +121,10 @@ class DashboardScreen extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text('$noOfStaffs', style: GoogleFonts.aBeeZee(fontSize: 20)),
+                  Text(
+                    '$noOfTrainers',
+                    style: GoogleFonts.aBeeZee(fontSize: 20),
+                  ),
                   Text(' Staff(s)'),
                 ],
               ),

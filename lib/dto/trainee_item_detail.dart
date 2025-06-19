@@ -1,5 +1,5 @@
-import 'package:schedulerapp/entity/gym_package.dart';
-import 'package:schedulerapp/entity/trainee.dart';
+import 'package:schedulerapp/data/models/gym_package.dart';
+import 'package:schedulerapp/data/models/trainee.dart';
 
 class TraineeItemDetail {
   final Trainee trainee;

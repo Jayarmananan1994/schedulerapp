@@ -4,8 +4,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:schedulerapp/component/gogym_avatar.dart';
 import 'package:schedulerapp/component/trainee_package_manager_widget.dart';
 import 'package:schedulerapp/constant.dart';
-import 'package:schedulerapp/entity/gym_package.dart';
-import 'package:schedulerapp/entity/trainee.dart';
+import 'package:schedulerapp/data/models/gym_package.dart';
+import 'package:schedulerapp/data/models/trainee.dart';
 import 'package:schedulerapp/service/storage_service.dart';
 
 class TraineeSelectionWidget extends StatefulWidget {

@@ -1,8 +1,8 @@
-import 'package:schedulerapp/entity/schedule.dart';
-import 'package:schedulerapp/entity/staff.dart';
+import 'package:schedulerapp/data/models/schedule.dart';
+import 'package:schedulerapp/data/models/trainer.dart';
 
 class PayrollDetailItem {
-  final Staff staff;
+  final Trainer trainer;
   final int sessionsCompleted;
   final int noOfUpcomingSessions;
   final double amountEarned;
@@ -11,7 +11,7 @@ class PayrollDetailItem {
   final List<Schedule> upcomingSessions;
 
   PayrollDetailItem({
-    required this.staff,
+    required this.trainer,
     required this.sessionsCompleted,
     required this.noOfUpcomingSessions,
     required this.amountEarned,

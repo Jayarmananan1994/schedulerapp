@@ -4,13 +4,13 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:schedulerapp/component/hourly_grid.dart';
 import 'package:schedulerapp/constant.dart';
-import 'package:schedulerapp/entity/staff.dart';
+import 'package:schedulerapp/data/models/trainer.dart';
 import 'package:schedulerapp/service/storage_service.dart';
 import 'package:schedulerapp/util/app_util.dart';
 import 'package:collection/collection.dart';
 
 class DateTimeSelector extends StatefulWidget {
-  final Staff trainer;
+  final Trainer trainer;
   final Function onDateSelected;
   const DateTimeSelector({
     super.key,

@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
-import 'package:schedulerapp/page/home_page.dart';
-import 'package:schedulerapp/provider/staff_provider.dart';
+import 'package:schedulerapp/app/scheduler_app.dart';
+import 'package:schedulerapp/provider/trainer_provider.dart';
 import 'package:schedulerapp/service_locator.dart';
 
 void main() async {
@@ -9,22 +9,8 @@ void main() async {
   await setupServiceLocator();
   runApp(
     MultiProvider(
-      providers: [ChangeNotifierProvider(create: (_) => StaffProvider())],
-      child: const MyApp(),
+      providers: [ChangeNotifierProvider(create: (_) => TrainerProvider())],
+      child: const SchedulerApp(),
     ),
   );
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return CupertinoApp(
-      title: 'Scheduler App',
-      debugShowCheckedModeBanner: false,
-      theme: CupertinoThemeData(brightness: Brightness.light),
-      home: HomePage(),
-    );
-  }
 }
