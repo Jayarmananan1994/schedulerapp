@@ -142,8 +142,9 @@ class _AddClientModalState extends State<AddClientModal> {
               _selectedPackage!.name == packages[index].name;
           return GestureDetector(
             onTap: () {
+              String packageName = packages[index].name;
               setState(() => _selectedPackage = packages[index]);
-              _packageNameTextController.text = packages[index].name;
+              _packageNameTextController.text = packageName;
               _priceTextController.text = packages[index].cost.toString();
             },
             child: Container(
@@ -250,7 +251,9 @@ class _AddClientModalState extends State<AddClientModal> {
       );
       await _storageService.saveTrainee(newTrainee);
       await _storageService.addNewPackageToTrainee(
-        _packageNameTextController.text,
+        _packageNameTextController.text == 'New Package'
+            ? 'Package for $name'
+            : _packageNameTextController.text,
         int.parse(_noOfSessionTextController.text),
         double.parse(_priceTextController.text),
         newTrainee.id,
@@ -313,7 +316,7 @@ class _AddClientModalState extends State<AddClientModal> {
   List<Widget> _packageFormfields() {
     List<Widget> packageFields = [];
     bool isCustomPackageSelected =
-        _selectedPackage != null && _selectedPackage!.name == 'Custom Package';
+        _selectedPackage != null && _selectedPackage!.name == 'New Package';
     bool isPackageSelected = _selectedPackage != null;
     if (isCustomPackageSelected) {
       packageFields.addAll([
