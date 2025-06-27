@@ -234,8 +234,8 @@ class _CreateScheduleModalState extends State<CreateScheduleModal> {
                 (date) => Schedule(
                   id: UniqueKey().toString(),
                   startTime: date,
-                  trainee: selectedTrainee!,
-                  trainer: selectedTrainer!,
+                  traineeId: selectedTrainee!.id,
+                  trainerId: selectedTrainer!.id,
                   endTime: date.copyWith(
                     hour: date.hour + 1,
                     minute: date.minute,

@@ -2,12 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 import 'package:schedulerapp/constant.dart';
 import 'package:schedulerapp/dto/gym_stats.dart';
 import 'package:schedulerapp/page/gym_management/trainee_list_widget.dart';
 import 'package:schedulerapp/page/gym_management/trainer_list_widget.dart';
-import 'package:schedulerapp/provider/trainer_provider.dart';
 import 'package:schedulerapp/service/storage_service.dart';
 
 class GymManagementScreen extends StatefulWidget {
@@ -31,7 +29,7 @@ class _GymManagementScreenState extends State<GymManagementScreen> {
   @override
   void initState() {
     statsDetail = _storageService.getGymStats();
-    Provider.of<TrainerProvider>(context, listen: false).getTrainerList();
+    // Provider.of<TrainerProvider>(context, listen: false).getTrainerList();
     super.initState();
   }
 

@@ -119,7 +119,7 @@ class _TrainerSelectionWidgetState extends State<TrainerSelectionWidget> {
                       ),
                     ),
                     Text(
-                      trainers[index].role ?? 'Trainer',
+                      trainers[index].role,
                       style: GoogleFonts.inter(
                         color: colorgrey,
                         fontSize: 10,

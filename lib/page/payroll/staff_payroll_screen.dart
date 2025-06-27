@@ -1,12 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import 'package:schedulerapp/constant.dart';
 import 'package:schedulerapp/dto/staff_payroll.dart';
 import 'package:schedulerapp/page/payroll/payroll_detail_widget.dart';
-import 'package:schedulerapp/service/storage_service.dart';
+import 'package:schedulerapp/provider/payroll_provider.dart';
 
 class StaffPayrollScreen extends StatefulWidget {
   const StaffPayrollScreen({super.key});
@@ -17,7 +17,6 @@ class StaffPayrollScreen extends StatefulWidget {
 
 class _StaffPayrollScreenState extends State<StaffPayrollScreen> {
   DateFormat dateFormat = DateFormat('MMM yyyy');
-  final StorageService _storageService = GetIt.instance<StorageService>();
 
   @override
   Widget build(BuildContext context) {
@@ -54,26 +53,39 @@ class _StaffPayrollScreenState extends State<StaffPayrollScreen> {
   }
 
   contentIos() {
-    List<StaffPayroll> staffPayroll =
-        _storageService.getPayrollDetailsOfAllStaff();
-    double totalAmt =
-        staffPayroll.isEmpty
-            ? 0
-            : staffPayroll
-                .map((payroll) => payroll.dueAmount)
-                .reduce((a, b) => a + b);
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            monthOverviewDetail(totalAmt),
-            SizedBox(height: 32),
-            staffList(staffPayroll),
-          ],
-        ),
-      ),
+    return Consumer<PayrollProvider>(
+      builder: (context, provider, child) {
+        if (provider.isLoading) {
+          return Center(child: CupertinoActivityIndicator());
+        }
+
+        if (provider.staffPayroll == null || provider.staffPayroll!.isEmpty) {
+          return Center(
+            child: Text(
+              'No payroll data available',
+              style: GoogleFonts.inter(fontSize: 16, color: colorgrey),
+            ),
+          );
+        }
+        double dueAmount = provider.staffPayroll!.fold(
+          0,
+          (sum, payroll) => sum + payroll.dueAmount,
+        );
+        //return buildContent(provider.staffPayroll);
+        return SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                monthOverviewDetail(dueAmount),
+                SizedBox(height: 32),
+                staffList(provider.staffPayroll!),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 

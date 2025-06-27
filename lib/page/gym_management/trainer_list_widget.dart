@@ -23,7 +23,7 @@ class TrainerListWidget extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Staff Members',
+                'Trainer Members',
                 style: GoogleFonts.inter(
                   color: colorblack,
                   fontSize: 18,
@@ -31,7 +31,7 @@ class TrainerListWidget extends StatelessWidget {
                 ),
               ),
               SizedBox(
-                width: 120,
+                width: 140,
                 child: TextButton(
                   style: TextButton.styleFrom(
                     backgroundColor: colorBlue,
@@ -45,7 +45,7 @@ class TrainerListWidget extends StatelessWidget {
                     children: [
                       Icon(Icons.add, color: Colors.white),
                       Text(
-                        'Add Staff',
+                        'Add Trainer',
                         style: GoogleFonts.inter(
                           fontSize: 14,
                           color: Colors.white,

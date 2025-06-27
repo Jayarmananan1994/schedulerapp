@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:intl/intl.dart';
-import 'package:schedulerapp/data/models/schedule.dart';
 import 'package:schedulerapp/data/models/trainee.dart';
 import 'package:schedulerapp/data/models/trainer.dart';
+import 'package:schedulerapp/dto/schedule_dto.dart';
 import 'package:schedulerapp/service/storage_service.dart';
 
 class ScheduleEditDetailModal extends StatefulWidget {
-  final Schedule schedule;
+  final ScheduleDto schedule;
   const ScheduleEditDetailModal({super.key, required this.schedule});
 
   @override

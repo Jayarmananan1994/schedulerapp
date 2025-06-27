@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:schedulerapp/constant.dart';
-import 'package:schedulerapp/data/models/schedule.dart';
+import 'package:schedulerapp/domain/service/schedule_service.dart';
+import 'package:schedulerapp/dto/schedule_dto.dart';
 import 'package:schedulerapp/modal/createschedule/create_schedule_modal.dart';
 import 'package:schedulerapp/component/month_day_selector.dart';
 import 'package:schedulerapp/component/schdeule_card.dart';
-import 'package:schedulerapp/service/storage_service.dart';
 import 'package:schedulerapp/util/dialog_util.dart';
 
 class ScheduleScreen extends StatefulWidget {
@@ -22,7 +22,7 @@ class _ScheduleScreenState extends State<ScheduleScreen>
   DateTime? _selectedDay;
   final double _hourHeight = 150.0;
   final ScrollController _scrollController = ScrollController();
-  final StorageService _storageService = GetIt.instance<StorageService>();
+  final ScheduleService _scheduleService = GetIt.instance<ScheduleService>();
 
   @override
   void initState() {
@@ -176,15 +176,15 @@ class _ScheduleScreenState extends State<ScheduleScreen>
     );
   }
 
-  List<Widget> _buildScheduleCards(List<Schedule> items) {
+  List<Widget> _buildScheduleCards(List<ScheduleDto> items) {
     if (items.isEmpty) {
       return [];
     }
     final deviceWidth = MediaQuery.of(context).size.width - 60;
-    List<List<Schedule>> itemsSortedByTimes = [];
+    List<List<ScheduleDto>> itemsSortedByTimes = [];
     List<Widget> scheduleCards = [];
     items.sort((a, b) => a.startTime.compareTo(b.startTime));
-    List<Schedule> currentList = [items[0]];
+    List<ScheduleDto> currentList = [items[0]];
     itemsSortedByTimes.add(currentList);
     for (int i = 1; i < items.length; i++) {
       if (currentList.first.intersects(items[i])) {
@@ -209,7 +209,7 @@ class _ScheduleScreenState extends State<ScheduleScreen>
   }
 
   Widget _buildPositionedCardItem(
-    Schedule item,
+    ScheduleDto item,
     double width,
     double leftPadding,
   ) {
@@ -243,8 +243,8 @@ class _ScheduleScreenState extends State<ScheduleScreen>
     );
   }
 
-  List<Schedule> _getScheduleItemsForSelectedDay() {
-    return _storageService.getScheduleItems(
+  List<ScheduleDto> _getScheduleItemsForSelectedDay() {
+    return _scheduleService.getSchedulesByDate(
       DateTime(_selectedDay!.year, _selectedDay!.month, _selectedDay!.day),
     );
   }

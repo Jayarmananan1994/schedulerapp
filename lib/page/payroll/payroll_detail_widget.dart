@@ -1,9 +1,11 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:schedulerapp/component/gogym_avatar.dart';
 import 'package:schedulerapp/constant.dart';
 import 'package:schedulerapp/dto/staff_payroll.dart';
+import 'package:schedulerapp/page/trainer_schedule_history/trainer_schedule_history_page.dart';
 
 class PayrollDetailWidget extends StatelessWidget {
   final StaffPayroll staffPayroll;
@@ -21,7 +23,7 @@ class PayrollDetailWidget extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.max,
-        children: [avatar(), SizedBox(width: 16), detailContent()],
+        children: [avatar(), SizedBox(width: 16), detailContent(context)],
       ),
     );
   }
@@ -37,7 +39,7 @@ class PayrollDetailWidget extends StatelessWidget {
     );
   }
 
-  detailContent() {
+  detailContent(BuildContext context) {
     return Expanded(
       child: SizedBox(
         height: 320,
@@ -49,7 +51,7 @@ class PayrollDetailWidget extends StatelessWidget {
             instructorSessionDeatil(),
             previousMonthDetail(),
             upcomignSessions(),
-            viewHistoryButton(),
+            viewHistoryButton(context),
           ],
         ),
       ),
@@ -75,7 +77,7 @@ class PayrollDetailWidget extends StatelessWidget {
               ),
             ),
             Text(
-              staffPayroll.trainer.role ?? 'Instructor',
+              staffPayroll.trainer.role,
               style: GoogleFonts.inter(fontSize: 14, color: colorgrey),
             ),
           ],
@@ -305,11 +307,11 @@ class PayrollDetailWidget extends StatelessWidget {
         .toList();
   }
 
-  viewHistoryButton() {
+  viewHistoryButton(BuildContext context) {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: () {},
+        onPressed: () => _showHistoryPage(context),
         style: ElevatedButton.styleFrom(
           shadowColor: Colors.transparent,
           backgroundColor: colorShadowGrey,
@@ -319,6 +321,17 @@ class PayrollDetailWidget extends StatelessWidget {
           'View Full History',
           style: GoogleFonts.inter(color: colorBlueTwo),
         ),
+      ),
+    );
+  }
+
+  _showHistoryPage(context) async {
+    await Navigator.of(context).push(
+      CupertinoPageRoute(
+        fullscreenDialog: true,
+        builder:
+            (context) =>
+                TrainerScheduleHistoryPage(trainer: staffPayroll.trainer),
       ),
     );
   }

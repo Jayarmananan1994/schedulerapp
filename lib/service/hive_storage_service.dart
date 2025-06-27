@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/adapters.dart';
-import 'package:intl/intl.dart';
-import 'package:path_provider/path_provider.dart' as path_provider;
 import 'package:schedulerapp/data/models/gym_package.dart';
 import 'package:schedulerapp/data/models/schedule.dart';
 import 'package:schedulerapp/data/models/trainee.dart';
@@ -18,114 +16,22 @@ import 'package:schedulerapp/util/app_util.dart';
 import 'package:collection/collection.dart';
 
 class HiveStorageService implements StorageService {
-  final DateFormat _todayDateFormat = DateFormat('hh:mm a');
-  final DateFormat _dateFormat = DateFormat('dd MMM hh:mm');
-  late Box<Trainer> _staffBox;
+  late Box<Trainer> _trainerBox;
   late Box<Trainee> _traineeBox;
   late Box<Schedule> _scheduleBox;
   late Box<GymPackage> _packageBox;
 
   @override
   Future<void> init() async {
-    if (!Hive.isAdapterRegistered(0)) {
-      final dbDir = await path_provider.getApplicationDocumentsDirectory();
-      Hive.init(dbDir.path);
-      await Hive.initFlutter();
-      Hive.registerAdapter(TraineeAdapter());
-      Hive.registerAdapter(TrainerAdapter());
-      Hive.registerAdapter(ScheduleAdapter());
-      Hive.registerAdapter(GymPackageAdapter());
-      _staffBox = await Hive.openBox<Trainer>('staffBox');
-      _traineeBox = await Hive.openBox<Trainee>('traineeBox');
-      _scheduleBox = await Hive.openBox<Schedule>('scheduleBox');
-      _packageBox = await Hive.openBox<GymPackage>('packageBox');
-    }
-  }
-
-  @override
-  List<Schedule> getScheduleItems(DateTime date) {
-    var schedules = _scheduleBox.values.toList();
-    return schedules
-        .where(
-          (schedule) =>
-              schedule.startTime.year == date.year &&
-              schedule.startTime.month == date.month &&
-              schedule.startTime.day == date.day,
-        )
-        .toList();
+    _trainerBox = await Hive.openBox<Trainer>('trainerBox');
+    _traineeBox = await Hive.openBox<Trainee>('traineeBox');
+    _scheduleBox = await Hive.openBox<Schedule>('scheduleBox');
+    _packageBox = await Hive.openBox<GymPackage>('packageBox');
   }
 
   @override
   Future<List<Trainer>> getTrainerList() {
-    return Future.value(_staffBox.values.toList());
-  }
-
-  @override
-  Future<bool> deleteStaff(Trainer staff) async {
-    if (!_staffBox.isOpen) {
-      return Future.value(false);
-    }
-    await staff.delete();
-    List scheduleKeys =
-        _scheduleBox
-            .toMap()
-            .entries
-            .where((entry) => entry.value.id == staff.id)
-            .map((entry) => entry.key)
-            .toList();
-    await _scheduleBox.deleteAll(scheduleKeys);
-    return Future.value(true);
-  }
-
-  @override
-  Future<List<Schedule>> getUpcomingSchedule(
-    Trainer staff,
-    DateTime date,
-  ) async {
-    return Future.value(_getUpcomingSchedule(staff, date));
-  }
-
-  List<Schedule> _getUpcomingSchedule(Trainer staff, DateTime date) {
-    return _scheduleBox.values
-        .where(
-          (schedule) =>
-              schedule.trainer.name == staff.name &&
-              schedule.startTime.isAfter(DateTime.now()),
-        )
-        .toList();
-  }
-
-  List<Schedule> _getCompletedSessionForLastMonth(Trainer staff) {
-    return _scheduleBox.values
-        .where(
-          (schedule) =>
-              schedule.trainer.name == staff.name &&
-              schedule.startTime.month == DateTime.now().month - 1 &&
-              schedule.startTime.year == DateTime.now().year,
-        )
-        .toList();
-  }
-
-  List<Schedule> _getCurrentMonthCompletedSession(Trainer staff) {
-    return _scheduleBox.values
-        .where(
-          (schedule) =>
-              schedule.trainer.name == staff.name &&
-              schedule.startTime.isBefore(DateTime.now()) &&
-              schedule.startTime.month == DateTime.now().month,
-        )
-        .toList();
-  }
-
-  List<Schedule> _getCurrentMonthUpcomingSessions(Trainer staff) {
-    return _scheduleBox.values
-        .where(
-          (schedule) =>
-              schedule.trainer.name == staff.name &&
-              schedule.startTime.isAfter(DateTime.now()) &&
-              schedule.startTime.month == DateTime.now().month,
-        )
-        .toList();
+    return Future.value(_trainerBox.values.toList());
   }
 
   @override
@@ -147,23 +53,8 @@ class HiveStorageService implements StorageService {
               ),
             )
             .toList();
+    print('List: ${list.length}');
     return Future.value(list);
-  }
-
-  @override
-  Future<bool> saveScheduleItem(Schedule schedule) async {
-    _validateTraineeAndTrainerSchedule(schedule);
-    await _scheduleBox.add(schedule);
-    return Future.value(true);
-  }
-
-  @override
-  Future<bool> saveTrainer(Trainer staff) async {
-    if (!_staffBox.isOpen) {
-      return Future.value(false);
-    }
-    await _staffBox.add(staff);
-    return Future.value(true);
   }
 
   @override
@@ -175,74 +66,6 @@ class HiveStorageService implements StorageService {
     return Future.value(true);
   }
 
-  void _validateTraineeAndTrainerSchedule(Schedule schedule) {
-    var schedules =
-        _scheduleBox.values.where((scheduleItem) {
-          return scheduleItem.trainer.name == schedule.trainer.name &&
-              scheduleItem.intersects(schedule);
-        }).toList();
-    if (schedules.isNotEmpty) {
-      throw ScheduleConflictException(
-        'Schedule conflict! ${schedule.trainer.name} has another schedule at the same time.',
-      );
-    }
-  }
-
-  @override
-  List<Schedule> getTraineePastSessions(String clientId) {
-    return _scheduleBox.values
-        .where(
-          (schedule) =>
-              schedule.trainee.id == clientId &&
-              schedule.startTime.isBefore(DateTime.now()),
-        )
-        .toList();
-  }
-
-  @override
-  List<Schedule> getTraineeUpcomingSessions(String clientId) {
-    return _scheduleBox.values
-        .where(
-          (schedule) =>
-              schedule.trainee.id == clientId &&
-              (schedule.startTime.isAfter(DateTime.now())),
-        )
-        .toList();
-  }
-
-  @override
-  Future<bool> updateSchedule(Schedule schedule) async {
-    await schedule.save();
-    return Future.value(true);
-  }
-
-  @override
-  int getCountOfPastSessionsByTrainer(
-    Trainer staff,
-    DateTime startOfMonth,
-    DateTime endOfMonth,
-  ) {
-    return _scheduleBox.values
-        .where(
-          (schedule) =>
-              schedule.trainer.id == staff.id &&
-              schedule.startTime.isAfter(startOfMonth) &&
-              schedule.startTime.isBefore(endOfMonth) &&
-              schedule.isLapsedSchedule(),
-        )
-        .length;
-  }
-
-  @override
-  int getCountOfPendingSessionsForTrainee(Trainee trainee) {
-    return _scheduleBox.values
-        .where(
-          (schedule) =>
-              schedule.trainee.id == trainee.id && schedule.isScheduleUnUsed(),
-        )
-        .length;
-  }
-
   @override
   List<TimeOfDay> fetchBookedTimeForStaffByDate(
     Trainer selectedTrainer,
@@ -252,7 +75,7 @@ class HiveStorageService implements StorageService {
         .where(
           (schedule) =>
               isSameDate(currentSelectedDate, schedule.startTime) &&
-              selectedTrainer == schedule.trainer,
+              selectedTrainer.id == schedule.trainerId,
         )
         .map((schedule) => TimeOfDay.fromDateTime(schedule.startTime))
         .toList();
@@ -318,7 +141,7 @@ class HiveStorageService implements StorageService {
 
   @override
   int getNoOfTrainers() {
-    return _staffBox.length;
+    return _trainerBox.length;
   }
 
   @override
@@ -343,25 +166,6 @@ class HiveStorageService implements StorageService {
       }
     }
     return expiringSessions;
-  }
-
-  @override
-  List<StaffPayroll> getPayrollDetailsOfAllStaff() {
-    return _staffBox.values.map((staff) {
-      var currentCompletedSessions = _getCurrentMonthCompletedSession(staff);
-      var lastMonthCompletedSessions = _getCompletedSessionForLastMonth(staff);
-      var currentUpcomingSessions = _getCurrentMonthUpcomingSessions(staff);
-      return StaffPayroll(
-        trainer: staff,
-        sessionCompleted: currentCompletedSessions.length,
-        upcomingSessionCount: currentUpcomingSessions.length,
-        lastPaidDate: DateTime.now().subtract(Duration(days: 30)),
-        lastMonthSessions: lastMonthCompletedSessions.length,
-        lastMonthPaid: lastMonthCompletedSessions.length * staff.payRate,
-        dueAmount: currentCompletedSessions.length * staff.payRate,
-        upcomingSchedules: currentUpcomingSessions,
-      );
-    }).toList();
   }
 
   @override
@@ -398,7 +202,7 @@ class HiveStorageService implements StorageService {
   @override
   Future<void> deleteAllData() {
     return Future.wait([
-      _staffBox.clear(),
+      _trainerBox.clear(),
       _traineeBox.clear(),
       _scheduleBox.clear(),
       _packageBox.clear(),
@@ -436,26 +240,27 @@ class HiveStorageService implements StorageService {
   }
 
   List<UpcomingSession> _mapToUpcomigSessions(List<Schedule> topSchedules) {
-    return topSchedules.map((schedule) {
-      String scheduleTime =
-          istoday(schedule.startTime)
-              ? _todayDateFormat.format(schedule.startTime)
-              : _dateFormat.format(schedule.startTime);
-      String title =
-          _packageBox.values
-              .firstWhere((sch) => sch.id == schedule.packageId)
-              .name;
+    // return topSchedules.map((schedule) {
+    //   String scheduleTime =
+    //       istoday(schedule.startTime)
+    //           ? _todayDateFormat.format(schedule.startTime)
+    //           : _dateFormat.format(schedule.startTime);
+    //   String title =
+    //       _packageBox.values
+    //           .firstWhere((sch) => sch.id == schedule.packageId)
+    //           .name;
 
-      return UpcomingSession(
-        scheduleTime,
-        title,
-        "with ${schedule.trainer.name}",
-        [
-          schedule.trainee.imageUrl ?? schedule.trainee.name,
-          schedule.trainer.imageUrl ?? schedule.trainer.name,
-        ],
-      );
-    }).toList();
+    //   return UpcomingSession(
+    //     scheduleTime,
+    //     title,
+    //     "with ${schedule.trainer.name}",
+    //     [
+    //       schedule.trainee.imageUrl ?? schedule.trainee.name,
+    //       schedule.trainer.imageUrl ?? schedule.trainer.name,
+    //     ],
+    //   );
+    // }).toList();
+    return [];
   }
 
   bool istoday(DateTime dateTime) {

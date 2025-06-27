@@ -1,8 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:schedulerapp/data/models/trainee.dart';
 import 'package:schedulerapp/data/models/trainer.dart';
-import 'package:schedulerapp/util/app_util.dart';
 part 'schedule.g.dart';
 
 @HiveType(typeId: 0)
@@ -16,9 +14,9 @@ class Schedule extends HiveObject {
   @HiveField(3)
   final DateTime endTime;
   @HiveField(4)
-  final Trainee trainee;
+  final String traineeId;
   @HiveField(5)
-  final Trainer trainer;
+  final String trainerId;
   @HiveField(6)
   final String meetingnote;
   @HiveField(7)
@@ -39,8 +37,8 @@ class Schedule extends HiveObject {
     this.title = '',
     required this.startTime,
     required this.endTime,
-    required this.trainee,
-    required this.trainer,
+    required this.traineeId,
+    required this.trainerId,
     this.meetingnote = '',
     this.location = 'ActiveSG',
     required this.traineeFee,
@@ -55,31 +53,7 @@ class Schedule extends HiveObject {
 
   @override
   String toString() {
-    return 'ScheduleItem(title: $title, startTime: $startTime, endTime: $endTime, client: ${trainee.name}, trainer: ${trainer.name}, meetingnote: $meetingnote)';
-  }
-
-  bool isLapsedSchedule() {
-    return DateTime.now().isAfter(endTime) && !isCancelled;
-  }
-
-  bool isScheduleUnUsed() {
-    return startTime.isAfter(DateTime.now());
-  }
-
-  Color getColorByStatus() {
-    if (isCancelled) {
-      return Colors.red.shade200;
-    }
-    if (isForfeited) {
-      return Colors.amber.shade300;
-    }
-    if (isSameDate(DateTime.now(), startTime)) {
-      return Colors.blue.shade200;
-    }
-    if (startTime.isAfter(DateTime.now())) {
-      return Colors.lightGreen.shade300;
-    }
-    return Colors.white60;
+    return 'ScheduleItem(title: $title, startTime: $startTime, endTime: $endTime, trainee: $traineeId, trainer: $trainerId, meetingnote: $meetingnote)';
   }
 
   Schedule copyWith({
@@ -92,13 +66,21 @@ class Schedule extends HiveObject {
       title: title,
       startTime: startTime,
       endTime: endTime,
-      trainee: trainee,
-      trainer: trainer,
+      traineeId: traineeId,
+      trainerId: trainerId,
       meetingnote: meetingnote,
       location: location,
       traineeFee: trainee.feePerSession,
       trainerCost: trainer.payRate,
       packageId: '',
     );
+  }
+
+  bool isScheduleUnUsed() {
+    return startTime.isAfter(DateTime.now());
+  }
+
+  bool isLapsedSchedule() {
+    return DateTime.now().isAfter(endTime) && !isCancelled;
   }
 }

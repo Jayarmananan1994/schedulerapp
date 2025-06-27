@@ -1,5 +1,5 @@
-import 'package:schedulerapp/data/models/schedule.dart';
 import 'package:schedulerapp/data/models/trainer.dart';
+import 'package:schedulerapp/dto/schedule_dto.dart';
 
 class StaffPayroll {
   final Trainer trainer;
@@ -9,7 +9,7 @@ class StaffPayroll {
   final int lastMonthSessions;
   final double lastMonthPaid;
   final double dueAmount;
-  List<Schedule> upcomingSchedules;
+  List<ScheduleDto> upcomingSchedules;
 
   StaffPayroll({
     required this.trainer,

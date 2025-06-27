@@ -5,8 +5,14 @@ import '../trainer_repository.dart';
 class HiveTrainerRepository implements TrainerRepository {
   late Box<Trainer> _trainerBox;
 
+  @override
   Future<void> init() async {
-    _trainerBox = await Hive.openBox<Trainer>('trainerBox');
+    print('Starting HiveTrainerRepository initialization');
+    if (!Hive.isAdapterRegistered(1)) {
+      print('Registering TrainerAdapter');
+      Hive.registerAdapter(TrainerAdapter());
+      _trainerBox = await Hive.openBox<Trainer>('trainerBox');
+    }
   }
 
   @override
@@ -36,5 +42,17 @@ class HiveTrainerRepository implements TrainerRepository {
   @override
   int getTrainerCount() {
     return _trainerBox.length;
+  }
+
+  @override
+  Trainer getTrainerById(String id) {
+    if (!_trainerBox.isOpen) {
+      throw Exception('Trainer box is not open');
+    }
+    final trainer = _trainerBox.values.firstWhere(
+      (trainer) => trainer.id == id,
+      orElse: () => throw Exception('Trainer not found'),
+    );
+    return trainer;
   }
 }

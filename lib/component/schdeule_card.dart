@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:schedulerapp/component/schedule_edit_detail_modal.dart';
-import 'package:schedulerapp/data/models/schedule.dart';
+import 'package:schedulerapp/dto/schedule_dto.dart';
 
 class SchdeuleCard extends StatelessWidget {
-  final Schedule scheduleItem;
+  final ScheduleDto scheduleItem;
 
   const SchdeuleCard({super.key, required this.scheduleItem});
 
@@ -13,7 +13,7 @@ class SchdeuleCard extends StatelessWidget {
     return schdeuleCard(scheduleItem, context);
   }
 
-  Widget schdeuleCard(Schedule item, context) {
+  Widget schdeuleCard(ScheduleDto item, context) {
     var title = _cardTitle(item);
     return Material(
       child: InkWell(
@@ -103,7 +103,7 @@ class SchdeuleCard extends StatelessWidget {
     // );
   }
 
-  avatarRow(Schedule item) {
+  avatarRow(ScheduleDto item) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [

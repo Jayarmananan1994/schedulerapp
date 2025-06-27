@@ -21,8 +21,8 @@ class ScheduleAdapter extends TypeAdapter<Schedule> {
       title: fields[1] as String,
       startTime: fields[2] as DateTime,
       endTime: fields[3] as DateTime,
-      trainee: fields[4] as Trainee,
-      trainer: fields[5] as Trainer,
+      traineeId: fields[4] as String,
+      trainerId: fields[5] as String,
       meetingnote: fields[6] as String,
       location: fields[7] as String?,
       traineeFee: fields[8] as double,
@@ -46,9 +46,9 @@ class ScheduleAdapter extends TypeAdapter<Schedule> {
       ..writeByte(3)
       ..write(obj.endTime)
       ..writeByte(4)
-      ..write(obj.trainee)
+      ..write(obj.traineeId)
       ..writeByte(5)
-      ..write(obj.trainer)
+      ..write(obj.trainerId)
       ..writeByte(6)
       ..write(obj.meetingnote)
       ..writeByte(7)
