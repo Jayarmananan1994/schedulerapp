@@ -1,21 +1,24 @@
 import 'package:flutter/cupertino.dart';
 import 'package:schedulerapp/data/models/trainer.dart';
-import 'package:schedulerapp/domain/service/trainer_service.dart';
 import 'package:schedulerapp/dto/schedule_dto.dart';
 import 'package:schedulerapp/dto/staff_payroll.dart';
 import 'package:schedulerapp/provider/schedule_provider.dart';
+import 'package:schedulerapp/provider/trainer_provider.dart';
 
-class PayrollProvider extends ChangeNotifier {
+class PayrollProvider with ChangeNotifier {
   final ScheduleProvider _scheduleProvider;
-  final TrainerService _trainerService;
+  final TrainerProvider _trainerProvider;
   List<StaffPayroll>? _staffPayroll;
   bool _isLoading = false;
   String? _error;
   List<StaffPayroll>? get staffPayroll => _staffPayroll;
   bool get isLoading => _isLoading;
   String? get error => _error;
-  PayrollProvider(this._scheduleProvider, this._trainerService) {
+  PayrollProvider(this._scheduleProvider, this._trainerProvider) {
     _initialize();
+    _trainerProvider.addListener(() {
+      _initialize();
+    });
   }
 
   Future<void> _initialize() async {
@@ -23,7 +26,7 @@ class PayrollProvider extends ChangeNotifier {
       _isLoading = true;
       _error = null;
       notifyListeners();
-      List<Trainer> trainers = await _trainerService.getAllTrainers();
+      List<Trainer> trainers = _trainerProvider.trainerList ?? [];
       _staffPayroll = [];
       for (final tr in trainers) {
         var today = DateTime.now();

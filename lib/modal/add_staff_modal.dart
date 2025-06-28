@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:schedulerapp/constant.dart';
 import 'package:schedulerapp/data/models/trainer.dart';
 import 'package:schedulerapp/provider/trainer_provider.dart';
+import 'package:schedulerapp/util/dialog_util.dart';
 
 class AddTrainerModal extends StatefulWidget {
   const AddTrainerModal({super.key});
@@ -35,7 +36,7 @@ class _AddTrainerModalState extends State<AddTrainerModal> {
       navigationBar: CupertinoNavigationBar(
         leading: CupertinoButton(
           padding: EdgeInsets.zero,
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => Navigator.pop(context, false),
           child: Text('Cancel'),
         ),
         middle: Text(
@@ -235,21 +236,22 @@ class _AddTrainerModalState extends State<AddTrainerModal> {
           .read<TrainerProvider>()
           .addStaff(newTrainer)
           .then((value) async {
-            await showCupertinoDialog(
-              context: context,
-              builder:
-                  (context) => CupertinoAlertDialog(
-                    title: Text('Success'),
-                    content: Text('New Trainer added.'),
-                    actions: [
-                      CupertinoDialogAction(
-                        child: Text('OK'),
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                      ),
-                    ],
-                  ),
+            if (!value) {
+              await showAppInfoDialog(
+                context,
+                'Error',
+                'Failed to create new Trainer',
+                'Ok',
+                true,
+              );
+              return;
+            }
+            showAppInfoDialog(
+              context,
+              'Success',
+              'New Trainer added.',
+              'Ok',
+              false,
             );
             Navigator.pop(context, true);
           })

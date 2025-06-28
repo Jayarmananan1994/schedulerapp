@@ -34,6 +34,6 @@ class GymPackage extends HiveObject {
 
   @override
   String toString() {
-    return 'GymPackage(name: $name, noOfSessions: $noOfSessions, cost: $cost, noOfSessionsAvailable: $noOfSessionsAvailable, traineeId: $traineeId)';
+    return 'GymPackage(id:$id, name: $name, noOfSessions: $noOfSessions, cost: $cost, noOfSessionsAvailable: $noOfSessionsAvailable, traineeId: $traineeId)';
   }
 }

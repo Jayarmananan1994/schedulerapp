@@ -1,12 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import 'package:schedulerapp/constant.dart';
 import 'package:schedulerapp/data/models/gym_package.dart';
 import 'package:schedulerapp/data/models/trainee.dart';
-
-import 'package:schedulerapp/service/storage_service.dart';
+import 'package:schedulerapp/provider/gym_package_provider.dart';
+import 'package:schedulerapp/provider/trainee_provider.dart';
 
 class AddClientModal extends StatefulWidget {
   const AddClientModal({super.key});
@@ -21,7 +21,7 @@ class _AddClientModalState extends State<AddClientModal> {
   final _noOfSessionTextController = TextEditingController();
   final _priceTextController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  final StorageService _storageService = GetIt.I<StorageService>();
+  //final StorageService _storageService = GetIt.I<StorageService>();
 
   String? _nameError;
   String? _packageNameError;
@@ -129,8 +129,35 @@ class _AddClientModalState extends State<AddClientModal> {
   }
 
   _trainingPackageList() {
-    var packages = [GymPackage('', 'New Package', 0, 0.0, 0, 'traineeId')];
-    packages.addAll(_storageService.getPackageList());
+    return Consumer<GymPackageProvider>(
+      builder: (context, gymPackageProvider, child) {
+        if (gymPackageProvider.error != null) {
+          return Center(
+            child: Text(
+              'Error loading packages: ${gymPackageProvider.error}',
+              style: TextStyle(color: Colors.red),
+            ),
+          );
+        }
+        var packages = gymPackageProvider.gymPackages;
+        if (gymPackageProvider.isLoading ||
+            packages == null ||
+            packages.isEmpty) {
+          return _trainingPackageListView([
+            GymPackage('', 'New Package', 0, 0.0, 0, 'traineeId'),
+          ]);
+        }
+        var allPackages = [
+          GymPackage('', 'New Package', 0, 0.0, 0, 'traineeId'),
+        ]..addAll(packages);
+        return _trainingPackageListView(allPackages);
+      },
+    );
+  }
+
+  _trainingPackageListView(List<GymPackage> packages) {
+    //var packages = [GymPackage('', 'New Package', 0, 0.0, 0, 'traineeId')];
+    //packages.addAll(_storageService.getPackageList());
 
     return SizedBox(
       height: 40,
@@ -249,8 +276,13 @@ class _AddClientModalState extends State<AddClientModal> {
         _selectedAvatar,
         0,
       );
-      await _storageService.saveTrainee(newTrainee);
-      await _storageService.addNewPackageToTrainee(
+      //await _storageService.saveTrainee(newTrainee);
+      await Provider.of<TraineeProvider>(
+        context,
+        listen: false,
+      ).saveTrainee(newTrainee);
+
+      Provider.of<GymPackageProvider>(context, listen: false).saveGymPackage(
         _packageNameTextController.text == 'New Package'
             ? 'Package for $name'
             : _packageNameTextController.text,
@@ -258,6 +290,15 @@ class _AddClientModalState extends State<AddClientModal> {
         double.parse(_priceTextController.text),
         newTrainee.id,
       );
+
+      // await _storageService.addNewPackageToTrainee(
+      //   _packageNameTextController.text == 'New Package'
+      //       ? 'Package for $name'
+      //       : _packageNameTextController.text,
+      //   int.parse(_noOfSessionTextController.text),
+      //   double.parse(_priceTextController.text),
+      //   newTrainee.id,
+      // );
       showCupertinoDialog(
         context: context,
         builder:

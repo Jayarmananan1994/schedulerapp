@@ -3,14 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import 'package:schedulerapp/component/date_time_selector.dart';
 import 'package:schedulerapp/constant.dart';
 import 'package:schedulerapp/data/models/gym_package.dart';
-import 'package:schedulerapp/data/models/schedule.dart';
 import 'package:schedulerapp/data/models/trainee.dart';
 import 'package:schedulerapp/data/models/trainer.dart';
+import 'package:schedulerapp/dto/create_schedule_dto.dart';
 import 'package:schedulerapp/modal/createschedule/trainee_selection_widget.dart';
 import 'package:schedulerapp/modal/createschedule/trainer_selection_widget.dart';
+import 'package:schedulerapp/provider/gym_package_provider.dart';
+import 'package:schedulerapp/provider/schedule_provider.dart';
 import 'package:schedulerapp/service/storage_service.dart';
 import 'package:schedulerapp/util/dialog_util.dart';
 
@@ -85,10 +88,12 @@ class _CreateScheduleModalState extends State<CreateScheduleModal> {
         mainAxisSize: MainAxisSize.max,
         children: [
           TraineeSelectionWidget(
-            onTraineeSelect: _onTraineeSelection,
-            onPackageSelect: _onPackageSelection,
+            onTraineeSelect: (trainee) => selectedTrainee = trainee,
+            onPackageSelect: (package) => selectedPackage = package,
           ),
-          TrainerSelectionWidget(onSelect: _onTrainerSelection),
+          TrainerSelectionWidget(
+            onSelect: (trainer) => setState(() => selectedTrainer = trainer),
+          ),
           SizedBox(height: 16),
           selectedTrainer != null
               ? DateTimeSelector(
@@ -106,18 +111,6 @@ class _CreateScheduleModalState extends State<CreateScheduleModal> {
         ],
       ),
     );
-  }
-
-  _onTrainerSelection(trainer) {
-    setState(() => selectedTrainer = trainer);
-  }
-
-  _onTraineeSelection(Trainee trainee) {
-    selectedTrainee = trainee;
-  }
-
-  _onPackageSelection(package) {
-    selectedPackage = package;
   }
 
   locationTextField() {
@@ -224,50 +217,55 @@ class _CreateScheduleModalState extends State<CreateScheduleModal> {
       return;
     }
 
-    if (selectedTrainee != null &&
-        selectedTrainer != null &&
-        selectedDates.isNotEmpty &&
-        selectedPackage != null) {
-      List<Schedule> newSchedules =
+    if (_isFormValueValid()) {
+      final createDtos =
           selectedDates
               .map(
-                (date) => Schedule(
-                  id: UniqueKey().toString(),
-                  startTime: date,
-                  traineeId: selectedTrainee!.id,
-                  trainerId: selectedTrainer!.id,
-                  endTime: date.copyWith(
-                    hour: date.hour + 1,
-                    minute: date.minute,
-                  ),
-                  trainerCost: selectedTrainer!.payRate,
-                  traineeFee: selectedTrainee!.feePerSession,
-                  packageId: selectedPackage!.id,
-                  location: _locationController.text,
+                (dates) => CreateScheduleDto(
+                  null,
+                  selectedTrainer!,
+                  selectedTrainee!,
+                  dates,
+                  dates.add(Duration(hours: 1)),
+                  '',
+                  _locationController.text,
+                  selectedPackage!,
                 ),
               )
               .toList();
-      await _storageService.addSchedules(newSchedules);
-      await selectedPackage!.deductSession(newSchedules.length);
 
-      showCupertinoDialog(
-        context: context,
-        builder:
-            (context) => CupertinoAlertDialog(
-              title: Text('Success'),
-              content: Text('Schedule saved successfully.'),
-              actions: [
-                CupertinoDialogAction(
-                  child: Text('OK'),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                ),
-              ],
-            ),
+      print('Create DTOs: $createDtos');
+      Map result = await Provider.of<ScheduleProvider>(
+        context,
+        listen: false,
+      ).addSchedule(createDtos);
+      print('Create schdeule Result: $result');
+      Provider.of<GymPackageProvider>(
+        context,
+        listen: false,
+      ).deductPackageAvailability(selectedPackage, selectedDates.length);
+
+      showAppInfoDialog(
+        context,
+        result['result'] ? 'Success' : 'Error',
+        result['result'] ? 'Schedule saved successfully.' : result['message'],
+        'Ok',
+        !result['result'],
       ).then((_) {
-        Navigator.pop(context, true);
+        if (result['result']) {
+          Navigator.pop(context, true);
+        }
       });
     }
+  }
+
+  bool _isFormValueValid() {
+    print(
+      'Selected Trainee: $selectedTrainee - Selected Trainer: $selectedTrainer - Selected Dates: $selectedDates - Selected Package: $selectedPackage',
+    );
+    return selectedTrainee != null &&
+        selectedTrainer != null &&
+        selectedDates.isNotEmpty &&
+        selectedPackage != null;
   }
 }

@@ -8,7 +8,7 @@ class HiveScheduleRepository implements ScheduleRepository {
 
   @override
   Future<void> init() async {
-    if (Hive.isAdapterRegistered(0)) {
+    if (!Hive.isAdapterRegistered(0)) {
       Hive.registerAdapter(ScheduleAdapter());
       _scheduleBox = await Hive.openBox<Schedule>('scheduleBox');
     }
@@ -90,6 +90,16 @@ class HiveScheduleRepository implements ScheduleRepository {
       return true;
     } catch (e) {
       return false;
+    }
+  }
+
+  @override
+  Future<bool> saveSchedules(List<Schedule> schedules) async {
+    try {
+      await _scheduleBox.addAll(schedules);
+      return true;
+    } catch (e) {
+      throw Exception('Failed to save schedules: $e');
     }
   }
 }

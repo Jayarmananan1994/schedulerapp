@@ -32,4 +32,17 @@ class HiveGymPackageRepository implements GymPackageRepository {
     }
     return Future.value(_gymPackageBox.values.toList());
   }
+
+  @override
+  Future<void> updatePackage(GymPackage package) {
+    return _gymPackageBox.put(package.id, package);
+  }
+
+  @override
+  Future<GymPackage> save(GymPackage package) {
+    if (!_gymPackageBox.isOpen) {
+      throw Exception('Gym package box is not open');
+    }
+    return _gymPackageBox.put(package.id, package).then((_) => package);
+  }
 }

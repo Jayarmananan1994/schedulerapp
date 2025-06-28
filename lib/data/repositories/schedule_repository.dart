@@ -11,6 +11,7 @@ abstract class ScheduleRepository {
   );
   Future<List<Schedule>> getPastSchedulesByTrainer(Trainer trainer);
   Future<List<Schedule>> getUpcomingSchedulesByTrainer(Trainer trainer);
+  Future<bool> saveSchedules(List<Schedule> schedules);
   Future<bool> saveSchedule(Schedule schedule);
   Future<bool> updateSchedule(Schedule schedule);
   Future<bool> deleteSchedule(Schedule schedule);

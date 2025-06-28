@@ -4,10 +4,12 @@ import 'package:schedulerapp/data/repositories/gym_package_repository.dart';
 import 'package:schedulerapp/data/repositories/schedule_repository.dart';
 import 'package:schedulerapp/data/repositories/trainer_repository.dart';
 import 'package:schedulerapp/data/repositories/trainee_repository.dart';
+import 'package:schedulerapp/dto/create_schedule_dto.dart';
 import 'package:schedulerapp/dto/schedule_dto.dart';
-import 'package:schedulerapp/enums/schedule_filter.dart';
+import 'package:schedulerapp/exception/schdeule_creation_exception.dart';
+import 'package:schedulerapp/util/app_util.dart';
 
-class ScheduleProvider extends ChangeNotifier {
+class ScheduleProvider with ChangeNotifier {
   final ScheduleRepository _scheduleRepository;
   final TrainerRepository _trainerRepository;
   final TraineeRepository _traineeRepository;
@@ -58,7 +60,6 @@ class ScheduleProvider extends ChangeNotifier {
       notifyListeners();
 
       _schedules = await _scheduleRepository.getAllSchedules();
-
       _isLoading = false;
       notifyListeners();
     } catch (e) {
@@ -68,49 +69,72 @@ class ScheduleProvider extends ChangeNotifier {
     }
   }
 
-  List<ScheduleDto> getSchedulesForDate(DateTime date) {
-    if (_schedules == null) return [];
-
-    return _schedules!
-        .where(
-          (schedule) =>
-              schedule.startTime.year == date.year &&
-              schedule.startTime.month == date.month &&
-              schedule.startTime.day == date.day,
-        )
-        .map(_createScheduleDto)
-        .toList();
-  }
-
-  List<ScheduleDto> getSchedulesForTrainer(
-    String trainerId,
-    ScheduleFilter filter,
-  ) {
-    if (_schedules == null) return [];
-
-    final trainerSchedules = _schedules!.where(
-      (schedule) => schedule.trainerId == trainerId,
-    );
-
-    final now = DateTime.now();
-    final filtered = switch (filter) {
-      ScheduleFilter.today => trainerSchedules.where(
-        (schedule) =>
-            schedule.startTime.year == now.year &&
-            schedule.startTime.month == now.month &&
-            schedule.startTime.day == now.day,
-      ),
-      ScheduleFilter.upcoming => trainerSchedules.where(
-        (schedule) => schedule.startTime.isAfter(now),
-      ),
-      ScheduleFilter.completed => trainerSchedules.where(
-        (schedule) => schedule.startTime.isBefore(now),
-      ),
-      ScheduleFilter.all => trainerSchedules,
-    };
-
-    return filtered.map(_createScheduleDto).toList();
-  }
-
   Future<void> refresh() => _loadSchedules();
+
+  Future<Map> addSchedule(List<CreateScheduleDto> scheduleDto) async {
+    try {
+      _validateIfPackageAvailable(scheduleDto);
+      final schedules = _createSchedule(scheduleDto);
+      print('Adding schedules: $schedules');
+      await _scheduleRepository.saveSchedules(schedules);
+
+      await _loadSchedules();
+      return {'result': true, 'message': 'Schedule added successfully'};
+    } on SchdeuleCreationException catch (e) {
+      notifyListeners();
+      return {'result': false, 'message': e.message};
+    } catch (e) {
+      notifyListeners();
+      return {
+        'result': false,
+        'message': 'Failed to add schedule. Please try again.',
+      };
+    }
+  }
+
+  List<Schedule> _createSchedule(List<CreateScheduleDto> scheduleDtos) {
+    return scheduleDtos.map((dto) {
+      return Schedule(
+        id: generateUniqueId(),
+        title:
+            dto.title ??
+            'Session by ${dto.trainee.name} with ${dto.trainer.name}',
+        startTime: dto.startTime,
+        endTime: dto.endTime,
+        traineeId: dto.trainee.id,
+        trainerId: dto.trainer.id,
+        meetingnote: dto.meetingnote ?? '',
+        location: dto.location,
+        packageId: dto.package.id,
+        traineeFee: dto.package.cost,
+        trainerCost: dto.trainer.payRate,
+      );
+    }).toList();
+  }
+
+  void _validateIfPackageAvailable(List<CreateScheduleDto> schedule) {
+    var packageMap = <String, Map>{};
+    for (var dto in schedule) {
+      if (packageMap.containsKey(dto.package.id)) {
+        packageMap[dto.package.id]!['count'] += 1;
+      } else {
+        packageMap[dto.package.id] = {
+          'availableCount': dto.package.noOfSessionsAvailable,
+          'count': 1,
+        };
+      }
+    }
+    print('Package Map: $packageMap');
+    for (var entry in packageMap.entries) {
+      final packageId = entry.key;
+      final availableCount = entry.value['availableCount'] as int;
+      final count = entry.value['count'] as int;
+
+      if (availableCount < count) {
+        throw SchdeuleCreationException(
+          'Package $packageId does not have enough sessions available.',
+        );
+      }
+    }
+  }
 }

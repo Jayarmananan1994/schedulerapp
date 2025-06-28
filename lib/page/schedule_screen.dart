@@ -1,13 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:schedulerapp/constant.dart';
-import 'package:schedulerapp/domain/service/schedule_service.dart';
-import 'package:schedulerapp/dto/schedule_dto.dart';
-import 'package:schedulerapp/modal/createschedule/create_schedule_modal.dart';
+import 'package:provider/provider.dart';
 import 'package:schedulerapp/component/month_day_selector.dart';
 import 'package:schedulerapp/component/schdeule_card.dart';
+import 'package:schedulerapp/constant.dart';
+import 'package:schedulerapp/dto/schedule_dto.dart';
+import 'package:schedulerapp/modal/createschedule/create_schedule_modal.dart';
+import 'package:schedulerapp/provider/schedule_provider.dart';
 import 'package:schedulerapp/util/dialog_util.dart';
 
 class ScheduleScreen extends StatefulWidget {
@@ -22,7 +22,7 @@ class _ScheduleScreenState extends State<ScheduleScreen>
   DateTime? _selectedDay;
   final double _hourHeight = 150.0;
   final ScrollController _scrollController = ScrollController();
-  final ScheduleService _scheduleService = GetIt.instance<ScheduleService>();
+  //final ScheduleService _scheduleService = GetIt.instance<ScheduleService>();
 
   @override
   void initState() {
@@ -160,18 +160,22 @@ class _ScheduleScreenState extends State<ScheduleScreen>
       );
     });
 
-    final scheduleItems = _getScheduleItemsForSelectedDay();
-    scheduleItems.sort((a, b) => a.startTime.compareTo(b.startTime));
     return SingleChildScrollView(
       controller: _scrollController,
-      child: SizedBox(
-        height: 24 * _hourHeight,
-        child: Stack(
-          children: [
-            Column(children: hourLines),
-            ..._buildScheduleCards(scheduleItems),
-          ],
-        ),
+      child: Consumer<ScheduleProvider>(
+        builder: (context, scheduleProvider, child) {
+          final scheduleItems = _getSchedulesForSelectedDay(scheduleProvider);
+          scheduleItems.sort((a, b) => a.startTime.compareTo(b.startTime));
+          return SizedBox(
+            height: 24 * _hourHeight,
+            child: Stack(
+              children: [
+                Column(children: hourLines),
+                ..._buildScheduleCards(scheduleItems),
+              ],
+            ),
+          );
+        },
       ),
     );
   }
@@ -243,10 +247,19 @@ class _ScheduleScreenState extends State<ScheduleScreen>
     );
   }
 
-  List<ScheduleDto> _getScheduleItemsForSelectedDay() {
-    return _scheduleService.getSchedulesByDate(
-      DateTime(_selectedDay!.year, _selectedDay!.month, _selectedDay!.day),
-    );
+  List<ScheduleDto> _getSchedulesForSelectedDay(
+    ScheduleProvider scheduleProvider,
+  ) {
+    return scheduleProvider.schedules != null
+        ? scheduleProvider.schedules!
+            .where(
+              (sch) =>
+                  sch.startTime.year == _selectedDay!.year &&
+                  sch.startTime.month == _selectedDay!.month &&
+                  sch.startTime.day == _selectedDay!.day,
+            )
+            .toList()
+        : [];
   }
 
   _showAddScheduleWindow() {

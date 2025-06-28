@@ -8,9 +8,10 @@ import 'package:schedulerapp/data/repositories/gym_package_repository.dart';
 import 'package:schedulerapp/data/repositories/schedule_repository.dart';
 import 'package:schedulerapp/data/repositories/trainee_repository.dart';
 import 'package:schedulerapp/data/repositories/trainer_repository.dart';
-import 'package:schedulerapp/domain/service/trainer_service.dart';
+import 'package:schedulerapp/provider/gym_package_provider.dart';
 import 'package:schedulerapp/provider/payroll_provider.dart';
 import 'package:schedulerapp/provider/schedule_provider.dart';
+import 'package:schedulerapp/provider/trainee_provider.dart';
 import 'package:schedulerapp/provider/trainer_provider.dart';
 import 'package:schedulerapp/service_locator.dart';
 
@@ -27,6 +28,12 @@ void main() async {
           create: (_) => TrainerProvider(GetIt.I<TrainerRepository>()),
         ),
         ChangeNotifierProvider(
+          create: (_) => GymPackageProvider(GetIt.I<GymPackageRepository>()),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => TraineeProvider(GetIt.I<TraineeRepository>()),
+        ),
+        ChangeNotifierProvider(
           create:
               (context) => ScheduleProvider(
                 GetIt.I<ScheduleRepository>(),
@@ -39,7 +46,7 @@ void main() async {
           create:
               (context) => PayrollProvider(
                 context.read<ScheduleProvider>(),
-                GetIt.I<TrainerService>(),
+                context.read<TrainerProvider>(),
               ),
         ),
       ],

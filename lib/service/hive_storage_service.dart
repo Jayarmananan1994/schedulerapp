@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:schedulerapp/data/models/gym_package.dart';
@@ -6,14 +7,10 @@ import 'package:schedulerapp/data/models/trainee.dart';
 import 'package:schedulerapp/data/models/trainer.dart';
 import 'package:schedulerapp/dto/expiring_client_session.dart';
 import 'package:schedulerapp/dto/gym_stats.dart';
-
-import 'package:schedulerapp/dto/staff_payroll.dart';
 import 'package:schedulerapp/dto/trainee_item_detail.dart';
 import 'package:schedulerapp/entity/upcoming_session.dart';
-import 'package:schedulerapp/exception/schdule_conflict_exception.dart';
 import 'package:schedulerapp/service/storage_service.dart';
 import 'package:schedulerapp/util/app_util.dart';
-import 'package:collection/collection.dart';
 
 class HiveStorageService implements StorageService {
   late Box<Trainer> _trainerBox;
