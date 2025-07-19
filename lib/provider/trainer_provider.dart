@@ -4,10 +4,10 @@ import 'package:schedulerapp/data/repositories/trainer_repository.dart';
 
 class TrainerProvider with ChangeNotifier {
   final TrainerRepository _trainerRepository;
-  List<Trainer>? _trainerList;
+  List<Trainer> _trainerList = [];
   bool _isLoading = false;
   String? _error;
-  List<Trainer>? get trainerList => _trainerList;
+  List<Trainer> get trainerList => _trainerList;
   bool get isLoading => _isLoading;
   String? get error => _error;
 
@@ -19,14 +19,11 @@ class TrainerProvider with ChangeNotifier {
     try {
       _isLoading = true;
       _error = null;
-      print('Starting to load trainers...');
       notifyListeners();
       _trainerList = await _trainerRepository.getAllTrainers();
       _isLoading = false;
-      print('Trainers loaded successfully: ${_trainerList?.length}');
       notifyListeners();
     } catch (e) {
-      print('Error loading trainers: $e');
       _isLoading = false;
       _error = 'Failed to load trainers';
       notifyListeners();
@@ -38,7 +35,7 @@ class TrainerProvider with ChangeNotifier {
         .deleteTrainer(staff)
         .then((success) {
           if (success) {
-            _trainerList?.remove(staff);
+            _trainerList.remove(staff);
             notifyListeners();
           } else {
             _error = 'Failed to delete trainer';
@@ -56,7 +53,7 @@ class TrainerProvider with ChangeNotifier {
         .addTrainer(newTrainer)
         .then((success) {
           if (success) {
-            _trainerList?.add(newTrainer);
+            _trainerList.add(newTrainer);
             notifyListeners();
             return true;
           } else {

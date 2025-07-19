@@ -149,16 +149,14 @@ class _AddClientModalState extends State<AddClientModal> {
         }
         var allPackages = [
           GymPackage('', 'New Package', 0, 0.0, 0, 'traineeId'),
-        ]..addAll(packages);
+          ...packages,
+        ];
         return _trainingPackageListView(allPackages);
       },
     );
   }
 
   _trainingPackageListView(List<GymPackage> packages) {
-    //var packages = [GymPackage('', 'New Package', 0, 0.0, 0, 'traineeId')];
-    //packages.addAll(_storageService.getPackageList());
-
     return SizedBox(
       height: 40,
       child: ListView.separated(
@@ -270,13 +268,7 @@ class _AddClientModalState extends State<AddClientModal> {
     if (_formValidate()) {
       final name = _nameController.text;
 
-      var newTrainee = Trainee(
-        UniqueKey().toString(),
-        name,
-        _selectedAvatar,
-        0,
-      );
-      //await _storageService.saveTrainee(newTrainee);
+      var newTrainee = Trainee(UniqueKey().toString(), name, _selectedAvatar);
       await Provider.of<TraineeProvider>(
         context,
         listen: false,
@@ -291,14 +283,6 @@ class _AddClientModalState extends State<AddClientModal> {
         newTrainee.id,
       );
 
-      // await _storageService.addNewPackageToTrainee(
-      //   _packageNameTextController.text == 'New Package'
-      //       ? 'Package for $name'
-      //       : _packageNameTextController.text,
-      //   int.parse(_noOfSessionTextController.text),
-      //   double.parse(_priceTextController.text),
-      //   newTrainee.id,
-      // );
       showCupertinoDialog(
         context: context,
         builder:

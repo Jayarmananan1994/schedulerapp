@@ -20,22 +20,19 @@ class TraineeAdapter extends TypeAdapter<Trainee> {
       fields[0] as String,
       fields[1] as String,
       fields[2] as String?,
-      fields[3] as double,
     );
   }
 
   @override
   void write(BinaryWriter writer, Trainee obj) {
     writer
-      ..writeByte(4)
+      ..writeByte(3)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
       ..write(obj.name)
       ..writeByte(2)
-      ..write(obj.imageUrl)
-      ..writeByte(3)
-      ..write(obj.feePerSession);
+      ..write(obj.imageUrl);
   }
 
   @override

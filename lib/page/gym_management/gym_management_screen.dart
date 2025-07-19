@@ -66,7 +66,7 @@ class _GymManagementScreenState extends State<GymManagementScreen> {
                     stats(),
                     SizedBox(height: 16),
                     TrainerListWidget(
-                      onTrainerDeleted: (value) {
+                      onTrainerAdded: (value) {
                         setState(() {
                           statsDetail = _storageService.getGymStats();
                         });

@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -14,7 +13,6 @@ import 'package:schedulerapp/modal/createschedule/trainee_selection_widget.dart'
 import 'package:schedulerapp/modal/createschedule/trainer_selection_widget.dart';
 import 'package:schedulerapp/provider/gym_package_provider.dart';
 import 'package:schedulerapp/provider/schedule_provider.dart';
-import 'package:schedulerapp/service/storage_service.dart';
 import 'package:schedulerapp/util/dialog_util.dart';
 
 class CreateScheduleModal extends StatefulWidget {
@@ -33,8 +31,6 @@ class _CreateScheduleModalState extends State<CreateScheduleModal> {
   GymPackage? selectedPackage;
   DateFormat dateFormat = DateFormat('yyyy-MM-dd');
   DateFormat timeFormat = DateFormat('hh:mm a');
-  //  final _formKey = GlobalKey<FormState>();
-  final StorageService _storageService = GetIt.I<StorageService>();
   final TextEditingController _locationController = TextEditingController();
   final TextEditingController _durationController = TextEditingController(
     text: '1',
@@ -233,13 +229,10 @@ class _CreateScheduleModalState extends State<CreateScheduleModal> {
                 ),
               )
               .toList();
-
-      print('Create DTOs: $createDtos');
       Map result = await Provider.of<ScheduleProvider>(
         context,
         listen: false,
       ).addSchedule(createDtos);
-      print('Create schdeule Result: $result');
       Provider.of<GymPackageProvider>(
         context,
         listen: false,
@@ -260,9 +253,6 @@ class _CreateScheduleModalState extends State<CreateScheduleModal> {
   }
 
   bool _isFormValueValid() {
-    print(
-      'Selected Trainee: $selectedTrainee - Selected Trainer: $selectedTrainer - Selected Dates: $selectedDates - Selected Package: $selectedPackage',
-    );
     return selectedTrainee != null &&
         selectedTrainer != null &&
         selectedDates.isNotEmpty &&

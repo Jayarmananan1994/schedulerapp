@@ -250,27 +250,17 @@ class _ScheduleScreenState extends State<ScheduleScreen>
   List<ScheduleDto> _getSchedulesForSelectedDay(
     ScheduleProvider scheduleProvider,
   ) {
-    return scheduleProvider.schedules != null
-        ? scheduleProvider.schedules!
-            .where(
-              (sch) =>
-                  sch.startTime.year == _selectedDay!.year &&
-                  sch.startTime.month == _selectedDay!.month &&
-                  sch.startTime.day == _selectedDay!.day,
-            )
-            .toList()
-        : [];
+    return scheduleProvider.scheduleDto
+        .where(
+          (sch) =>
+              sch.startTime.year == _selectedDay!.year &&
+              sch.startTime.month == _selectedDay!.month &&
+              sch.startTime.day == _selectedDay!.day,
+        )
+        .toList();
   }
 
   _showAddScheduleWindow() {
-    // showModalBottomSheet(
-    //   isScrollControlled: true,
-    //   context: context,
-    //   builder:
-    //       (context) => CreateScheduleModal(
-    //         defaultDateTime: _selectedDay ?? DateTime.now(),
-    //       ),
-    // );
     if (_selectedDay!.isBefore(
       DateTime.now().copyWith(
         hour: 0,

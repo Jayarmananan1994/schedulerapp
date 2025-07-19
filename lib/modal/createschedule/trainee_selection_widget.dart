@@ -24,7 +24,14 @@ class TraineeSelectionWidget extends StatefulWidget {
 class _TraineeSelectionWidgetState extends State<TraineeSelectionWidget> {
   Trainee? selectedTrainee;
   GymPackage? selectedPackage;
+  Future<List<Trainee>>? traineeListFuture;
   final StorageService _storageService = GetIt.I<StorageService>();
+
+  @override
+  void initState() {
+    super.initState();
+    traineeListFuture = _storageService.getTraineeList();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +49,7 @@ class _TraineeSelectionWidgetState extends State<TraineeSelectionWidget> {
         ),
         SizedBox(height: 16),
         FutureBuilder<List<Trainee>>(
-          future: _storageService.getTraineeList(),
+          future: traineeListFuture,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
@@ -77,10 +84,10 @@ class _TraineeSelectionWidgetState extends State<TraineeSelectionWidget> {
           bool isSelectedTrainee = selectedTrainee == trainees[index];
           return GestureDetector(
             onTap: () {
-              widget.onTraineeSelect(trainees[index]);
               setState(() {
                 selectedTrainee = trainees[index];
               });
+              //widget.onTraineeSelect(trainees[index]);
             },
             child: Container(
               width: 80,

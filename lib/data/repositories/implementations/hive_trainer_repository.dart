@@ -7,9 +7,7 @@ class HiveTrainerRepository implements TrainerRepository {
 
   @override
   Future<void> init() async {
-    print('Starting HiveTrainerRepository initialization');
     if (!Hive.isAdapterRegistered(1)) {
-      print('Registering TrainerAdapter');
       Hive.registerAdapter(TrainerAdapter());
       _trainerBox = await Hive.openBox<Trainer>('trainerBox');
     }

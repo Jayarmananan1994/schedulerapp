@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:schedulerapp/data/models/trainer.dart';
 import 'package:schedulerapp/dto/schedule_dto.dart';
 import 'package:schedulerapp/dto/staff_payroll.dart';
 import 'package:schedulerapp/provider/schedule_provider.dart';
@@ -26,32 +25,29 @@ class PayrollProvider with ChangeNotifier {
       _isLoading = true;
       _error = null;
       notifyListeners();
-      List<Trainer> trainers = _trainerProvider.trainerList ?? [];
       _staffPayroll = [];
-      for (final tr in trainers) {
+      for (final tr in _trainerProvider.trainerList) {
         var today = DateTime.now();
         List<ScheduleDto> schedulesCurrentMonth =
-            _scheduleProvider.schedules == null
-                ? []
-                : _scheduleProvider.schedules!
-                    .where(
-                      (s) =>
-                          s.trainer.id == tr.id &&
-                          s.startTime.year == today.year &&
-                          s.startTime.month == today.month,
-                    )
-                    .toList();
+            _scheduleProvider.scheduleDto
+                .where(
+                  (s) =>
+                      s.trainer.id == tr.id &&
+                      s.startTime.year == today.year &&
+                      s.startTime.month == today.month &&
+                      !s.isCancelled,
+                )
+                .toList();
         List<ScheduleDto> schedulesLastMonth =
-            _scheduleProvider.schedules == null
-                ? []
-                : _scheduleProvider.schedules!
-                    .where(
-                      (s) =>
-                          s.trainer.id == tr.id &&
-                          s.startTime.year == today.year &&
-                          s.startTime.month == today.month - 1,
-                    )
-                    .toList();
+            _scheduleProvider.scheduleDto
+                .where(
+                  (s) =>
+                      s.trainer.id == tr.id &&
+                      s.startTime.year == today.year &&
+                      s.startTime.month == today.month - 1 &&
+                      !s.isCancelled,
+                )
+                .toList();
 
         var sessionCompleted =
             schedulesCurrentMonth.where((s) => s.isCompletedSchedule()).length;

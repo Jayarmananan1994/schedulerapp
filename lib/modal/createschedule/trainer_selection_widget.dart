@@ -16,7 +16,14 @@ class TrainerSelectionWidget extends StatefulWidget {
 
 class _TrainerSelectionWidgetState extends State<TrainerSelectionWidget> {
   Trainer? selectedTrainer;
+  Future<List<Trainer>>? trainerListFuture;
   final StorageService _storageService = GetIt.I<StorageService>();
+
+  @override
+  void initState() {
+    trainerListFuture = _storageService.getTrainerList();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +41,7 @@ class _TrainerSelectionWidgetState extends State<TrainerSelectionWidget> {
         ),
         SizedBox(height: 16),
         FutureBuilder<List<Trainer>>(
-          future: _storageService.getTrainerList(),
+          future: trainerListFuture,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());

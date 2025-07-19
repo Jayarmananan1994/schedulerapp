@@ -33,9 +33,6 @@ class GymPackageProvider with ChangeNotifier {
   void deductPackageAvailability(GymPackage? package, int count) async {
     if (package != null && package.noOfSessionsAvailable > 0) {
       package.noOfSessionsAvailable -= count;
-      print(
-        'Updating package: ${package.id} with new availability: ${package.noOfSessionsAvailable}',
-      );
       await _gymPackageRepository.updatePackage(package);
       notifyListeners();
     } else {

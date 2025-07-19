@@ -50,7 +50,6 @@ class HiveStorageService implements StorageService {
               ),
             )
             .toList();
-    print('List: ${list.length}');
     return Future.value(list);
   }
 

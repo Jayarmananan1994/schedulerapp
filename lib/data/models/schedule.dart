@@ -1,6 +1,5 @@
 import 'package:hive_flutter/adapters.dart';
-import 'package:schedulerapp/data/models/trainee.dart';
-import 'package:schedulerapp/data/models/trainer.dart';
+
 part 'schedule.g.dart';
 
 @HiveType(typeId: 0)
@@ -8,19 +7,19 @@ class Schedule extends HiveObject {
   @HiveField(0)
   final String id;
   @HiveField(1)
-  final String title;
+  String title;
   @HiveField(2)
-  final DateTime startTime;
+  DateTime startTime;
   @HiveField(3)
-  final DateTime endTime;
+  DateTime endTime;
   @HiveField(4)
   final String traineeId;
   @HiveField(5)
-  final String trainerId;
+  String trainerId;
   @HiveField(6)
-  final String meetingnote;
+  String meetingnote;
   @HiveField(7)
-  final String? location;
+  String? location;
   @HiveField(8)
   final double traineeFee;
   @HiveField(9)
@@ -56,31 +55,15 @@ class Schedule extends HiveObject {
     return 'ScheduleItem(title: $title, startTime: $startTime, endTime: $endTime, trainee: $traineeId, trainer: $trainerId, meetingnote: $meetingnote)';
   }
 
-  Schedule copyWith({
-    required DateTime startTime,
-    required Trainer trainer,
-    required Trainee trainee,
-  }) {
-    return Schedule(
-      id: id,
-      title: title,
-      startTime: startTime,
-      endTime: endTime,
-      traineeId: traineeId,
-      trainerId: trainerId,
-      meetingnote: meetingnote,
-      location: location,
-      traineeFee: trainee.feePerSession,
-      trainerCost: trainer.payRate,
-      packageId: '',
-    );
-  }
-
   bool isScheduleUnUsed() {
     return startTime.isAfter(DateTime.now());
   }
 
   bool isLapsedSchedule() {
     return DateTime.now().isAfter(endTime) && !isCancelled;
+  }
+
+  bool isCompletedSchedule() {
+    return !isCancelled && DateTime.now().isAfter(endTime);
   }
 }

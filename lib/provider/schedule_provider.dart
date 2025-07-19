@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:intl/intl.dart';
 import 'package:schedulerapp/data/models/schedule.dart';
 import 'package:schedulerapp/data/repositories/gym_package_repository.dart';
 import 'package:schedulerapp/data/repositories/schedule_repository.dart';
@@ -6,6 +7,7 @@ import 'package:schedulerapp/data/repositories/trainer_repository.dart';
 import 'package:schedulerapp/data/repositories/trainee_repository.dart';
 import 'package:schedulerapp/dto/create_schedule_dto.dart';
 import 'package:schedulerapp/dto/schedule_dto.dart';
+import 'package:schedulerapp/entity/upcoming_session.dart';
 import 'package:schedulerapp/exception/schdeule_creation_exception.dart';
 import 'package:schedulerapp/util/app_util.dart';
 
@@ -30,9 +32,33 @@ class ScheduleProvider with ChangeNotifier {
 
   bool get isLoading => _isLoading;
   String? get error => _error;
-  List<ScheduleDto>? get schedules {
-    if (_schedules == null) return null;
+  List<ScheduleDto> get scheduleDto {
+    if (_schedules == null) return [];
     return _schedules!.map(_createScheduleDto).toList();
+  }
+
+  List<UpcomingSession> get upcomingSessions {
+    DateFormat dateFormat = DateFormat('dd MMM');
+    DateFormat todayDateFormat = DateFormat('hh:mm a');
+    return scheduleDto
+        .where((schedule) => schedule.startTime.isAfter(DateTime.now()))
+        .map((schedule) {
+          String scheduleTime =
+              _istoday(schedule.startTime)
+                  ? todayDateFormat.format(schedule.startTime)
+                  : dateFormat.format(schedule.startTime);
+          String title = schedule.package.name;
+          return UpcomingSession(
+            title: title,
+            subTitle: 'with ${schedule.trainer.name}',
+            scheduleTime: scheduleTime,
+            participants: [
+              schedule.trainee.imageUrl ?? schedule.trainee.name,
+              schedule.trainer.imageUrl ?? schedule.trainer.name,
+            ],
+          );
+        })
+        .toList();
   }
 
   ScheduleDto _createScheduleDto(Schedule schedule) {
@@ -49,6 +75,7 @@ class ScheduleProvider with ChangeNotifier {
       trainer,
       schedule.meetingnote,
       schedule.location,
+      schedule.isCancelled,
       package,
     );
   }
@@ -75,7 +102,7 @@ class ScheduleProvider with ChangeNotifier {
     try {
       _validateIfPackageAvailable(scheduleDto);
       final schedules = _createSchedule(scheduleDto);
-      print('Adding schedules: $schedules');
+
       await _scheduleRepository.saveSchedules(schedules);
 
       await _loadSchedules();
@@ -124,7 +151,6 @@ class ScheduleProvider with ChangeNotifier {
         };
       }
     }
-    print('Package Map: $packageMap');
     for (var entry in packageMap.entries) {
       final packageId = entry.key;
       final availableCount = entry.value['availableCount'] as int;
@@ -136,5 +162,50 @@ class ScheduleProvider with ChangeNotifier {
         );
       }
     }
+  }
+
+  void cancelSchedule(String scheduleId) {
+    final schedule = _schedules?.firstWhere(
+      (s) => s.id == scheduleId,
+      orElse: () => throw Exception('Schedule not found'),
+    );
+
+    if (schedule != null) {
+      schedule.isCancelled = true;
+      _scheduleRepository.updateSchedule(schedule);
+      notifyListeners();
+    } else {
+      throw Exception('Schedule not found');
+    }
+  }
+
+  Future<bool> updateSchedule(ScheduleDto scheduleDto) async {
+    final schedule = _schedules?.firstWhere(
+      (s) => s.id == scheduleDto.id,
+      orElse: () => throw Exception('Schedule not found'),
+    );
+
+    if (schedule != null) {
+      schedule.title = scheduleDto.title;
+      schedule.startTime = scheduleDto.startTime;
+      schedule.endTime = scheduleDto.endTime;
+      schedule.trainerId = scheduleDto.trainer.id;
+      schedule.meetingnote = scheduleDto.meetingnote;
+      schedule.location = scheduleDto.location;
+      schedule.packageId = scheduleDto.package.id;
+
+      _scheduleRepository.updateSchedule(schedule);
+      notifyListeners();
+      return true;
+    } else {
+      throw Exception('Schedule not found');
+    }
+  }
+
+  bool _istoday(DateTime dateTime) {
+    DateTime today = DateTime.now();
+    return dateTime.year == today.year &&
+        dateTime.month == today.month &&
+        dateTime.day == today.day;
   }
 }

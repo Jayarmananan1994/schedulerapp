@@ -1,6 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:schedulerapp/component/schedule_edit_detail_modal.dart';
+import 'package:schedulerapp/modal/schedule_detail/schedule_detail_modal.dart';
 import 'package:schedulerapp/dto/schedule_dto.dart';
 
 class SchdeuleCard extends StatelessWidget {
@@ -65,42 +66,21 @@ class SchdeuleCard extends StatelessWidget {
         : item.title;
   }
 
-  _showScheduleDetails(schedule, context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      builder: (context) {
-        return ScheduleEditDetailModal(schedule: schedule);
-      },
-    );
-    // showDialog(
+  _showScheduleDetails(schedule, context) async {
+    // showModalBottomSheet(
     //   context: context,
-
-    //   builder:
-    //       (context) => AlertDialog(
-    //         title: const Text('Schedule Details'),
-    //         content: ScheduleDetailModal(schedule: schedule),
-    //         actions: [
-    //           TextButton(
-    //             onPressed: () {
-    //               Navigator.of(context).pop();
-    //             },
-    //             child: const Text('Forfit'),
-    //           ),
-    //           TextButton(
-    //             onPressed: () {
-    //               Navigator.of(context).pop();
-    //             },
-    //             child: const Text('Cancel'),
-    //           ),
-    //           TextButton(
-    //             onPressed: () => Navigator.of(context).pop(),
-    //             child: const Text('Close'),
-    //           ),
-    //         ],
-    //       ),
-    //   //      builder: (context) => ScheduleDetailModal(schedule: schedule),
+    //   isScrollControlled: true,
+    //   builder: (context) {
+    //     return SchdeuleDetailModal(scheduleDto: schedule);
+    //   },
     // );
+
+    await Navigator.of(context).push(
+      CupertinoPageRoute(
+        fullscreenDialog: true,
+        builder: (context) => SchdeuleDetailModal(scheduleDto: schedule),
+      ),
+    );
   }
 
   avatarRow(ScheduleDto item) {

@@ -6,13 +6,14 @@ import 'package:schedulerapp/util/app_util.dart';
 
 class ScheduleDto {
   final String id;
-  final String title;
-  final DateTime startTime;
-  final DateTime endTime;
+  String title;
+  DateTime startTime;
+  DateTime endTime;
   final Trainee trainee;
-  final Trainer trainer;
-  final String meetingnote;
-  final String? location;
+  Trainer trainer;
+  String meetingnote;
+  String? location;
+  final bool isCancelled;
   final GymPackage package;
 
   ScheduleDto(
@@ -24,16 +25,11 @@ class ScheduleDto {
     this.trainer,
     this.meetingnote,
     this.location,
+    this.isCancelled,
     this.package,
   );
 
   Color getColorByStatus() {
-    // if (isCancelled) {
-    //   return Colors.red.shade200;
-    // }
-    // if (isForfeited) {
-    //   return Colors.amber.shade300;
-    // }
     if (isSameDate(DateTime.now(), startTime)) {
       return Colors.blue.shade200;
     }
@@ -43,16 +39,12 @@ class ScheduleDto {
     return Colors.white60;
   }
 
-  // bool isLapsedSchedule() {
-  //   return DateTime.now().isAfter(endTime) && !isCancelled;
-  // }
-
   bool isScheduleUnUsed() {
-    return startTime.isAfter(DateTime.now());
+    return !isCancelled && startTime.isAfter(DateTime.now());
   }
 
   bool isCompletedSchedule() {
-    return DateTime.now().isAfter(endTime);
+    return !isCancelled && DateTime.now().isAfter(endTime);
   }
 
   bool intersects(ScheduleDto other) {

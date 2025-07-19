@@ -10,7 +10,8 @@ class ProgressBar extends StatelessWidget {
     super.key,
     required this.progress,
     this.height = 10.0,
-    this.backgroundColor = const Color(0xFFE0E0E0), // Default grey
+    this.backgroundColor =
+        Colors.white, // const Color(0xFFE0E0E0), // Default grey
     this.progressColor = Colors.blue,
     this.borderRadius = BorderRadius.zero, // No border radius by default
   });

@@ -9,9 +9,9 @@ import 'package:schedulerapp/provider/trainer_provider.dart';
 import 'package:schedulerapp/util/dialog_util.dart';
 
 class TrainerListWidget extends StatelessWidget {
-  final Function? onTrainerDeleted;
+  final Function? onTrainerAdded;
 
-  const TrainerListWidget({super.key, this.onTrainerDeleted});
+  const TrainerListWidget({super.key, this.onTrainerAdded});
 
   @override
   Widget build(BuildContext context) {
@@ -67,11 +67,10 @@ class TrainerListWidget extends StatelessWidget {
   Widget _buildStaffList() {
     return Consumer<TrainerProvider>(
       builder: (context, staffProvider, child) {
-        var list = staffProvider.trainerList;
-
-        if (list == null) {
+        if (staffProvider.isLoading) {
           return Center(child: CircularProgressIndicator());
         }
+        var list = staffProvider.trainerList;
 
         if (list.isEmpty) {
           return SizedBox(
@@ -183,8 +182,8 @@ class TrainerListWidget extends StatelessWidget {
           'Ok',
           false,
         );
-        if (onTrainerDeleted != null) {
-          onTrainerDeleted!(true);
+        if (onTrainerAdded != null) {
+          onTrainerAdded!(true);
         }
       }
     });
@@ -198,8 +197,8 @@ class TrainerListWidget extends StatelessWidget {
       ),
     );
     if (isCreated) {
-      if (onTrainerDeleted != null) {
-        onTrainerDeleted!(true);
+      if (onTrainerAdded != null) {
+        onTrainerAdded!(true);
       }
     }
   }

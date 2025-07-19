@@ -24,7 +24,6 @@ class _TraineeListWidgetState extends State<TraineeListWidget> {
   @override
   void initState() {
     _traineeListFuture = _storageService.getTraineeDetailList();
-    print('Trainee List Future initialized');
     super.initState();
   }
 
@@ -83,7 +82,6 @@ class _TraineeListWidgetState extends State<TraineeListWidget> {
     return FutureBuilder<List<TraineeItemDetail>>(
       future: _traineeListFuture,
       builder: (context, snapshot) {
-        print('Connection state: ${snapshot.connectionState}');
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {

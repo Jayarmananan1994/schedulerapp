@@ -13,14 +13,11 @@ class Trainee extends HiveObject {
   @HiveField(2)
   final String? imageUrl;
 
-  @HiveField(3)
-  final double feePerSession;
-
-  Trainee(this.id, this.name, this.imageUrl, this.feePerSession);
+  Trainee(this.id, this.name, this.imageUrl);
 
   @override
   String toString() {
-    return 'Trainee(id: $id, name: $name, imageUrl: $imageUrl, feePerSession: $feePerSession)';
+    return 'Trainee(id: $id, name: $name, imageUrl: $imageUrl)';
   }
 
   @override

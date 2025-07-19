@@ -20,7 +20,12 @@ Future<void> setupServiceLocator() async {
   getIt.registerSingleton<TraineeRepository>(HiveTraineeRepository());
   getIt.registerSingleton<TrainerRepository>(HiveTrainerRepository());
   getIt.registerSingleton<GymPackageRepository>(HiveGymPackageRepository());
-  getIt.registerLazySingleton<ScheduleService>(() => ScheduleService());
+  getIt.registerLazySingleton<ScheduleService>(
+    () => ScheduleService(
+      getIt<ScheduleRepository>(),
+      getIt<TraineeRepository>(),
+    ),
+  );
   getIt.registerLazySingleton<TrainerService>(
     () => TrainerService(getIt<TrainerRepository>()),
   );

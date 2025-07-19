@@ -2,12 +2,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import 'package:schedulerapp/component/gogym_avatar.dart';
 import 'package:schedulerapp/constant.dart';
 import 'package:schedulerapp/data/models/trainer.dart';
 import 'package:schedulerapp/domain/service/schedule_service.dart';
 import 'package:schedulerapp/dto/schedule_dto.dart';
-import 'package:schedulerapp/page/trainer_schedule_history/schdeule_card.dart';
+import 'package:schedulerapp/dto/schedule_history_dto.dart';
+import 'package:schedulerapp/page/trainer_schedule_history/schedule_card.dart';
+import 'package:schedulerapp/provider/schedule_provider.dart';
 
 class TrainerScheduleHistoryPage extends StatefulWidget {
   final Trainer trainer;
@@ -166,11 +169,19 @@ class _TrainerScheduleHistoryPageState
   }
 
   _summary() {
+    final scheduleData =
+        Provider.of<ScheduleProvider>(context, listen: false).scheduleDto
+            .where((schedule) => schedule.trainer.id == widget.trainer.id)
+            .toList();
+    final completedSessions =
+        scheduleData.where((schedule) => schedule.isCompletedSchedule()).length;
+    final activeClient =
+        scheduleData.map((schedule) => schedule.trainee.id).toSet().length;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        info('156', 'Sessions completed'),
-        info('20', 'Active clients'),
+        info('$completedSessions', 'Sessions completed'),
+        info('$activeClient', 'Active clients'),
       ],
     );
   }
@@ -255,8 +266,8 @@ class _TrainerScheduleHistoryPageState
   }
 
   Widget _schduleList() {
-    return FutureBuilder<List<ScheduleDto>>(
-      future: _scheduleService.getSchedulesByClientId(widget.trainer.id),
+    return FutureBuilder<List<ScheduleHistoryDto>>(
+      future: _getScheduleByFilter(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CupertinoActivityIndicator());
@@ -283,16 +294,46 @@ class _TrainerScheduleHistoryPageState
           separatorBuilder: (context, index) => SizedBox(height: 12),
           itemBuilder: (context, index) {
             final schedule = schedules[index];
+            final status =
+                schedule.isCancelled
+                    ? 'Cancelled'
+                    : schedule.isCompleted
+                    ? 'Completed'
+                    : 'Upcoming';
             return ScheduleCard(
               clientName: schedule.trainee.name,
-              time: '${schedule.startTime} - ${schedule.endTime}',
-              status: '',
-              type: '', //schedule.packageId,
+              startTime: schedule.startTime,
+              endTime: schedule.endTime,
+              status: status,
+              type: '',
             );
           },
         );
       },
     );
+  }
+
+  Future<List<ScheduleHistoryDto>> _getScheduleByFilter() {
+    switch (selectedFilter) {
+      case 'Today':
+        return _scheduleService.getCurrentDaySchedulesByTrainerId(
+          widget.trainer.id,
+        );
+
+      case 'Upcoming':
+        return _scheduleService.getUpcomingSchedulesByTrainerId(
+          widget.trainer.id,
+        );
+
+      case 'Completed':
+        return _scheduleService.getCompletedSchedulesByTrainerId(
+          widget.trainer.id,
+        );
+      case 'All':
+        return _scheduleService.getSchedulesByTrainerId(widget.trainer.id);
+      default:
+        return Future.value([]);
+    }
   }
 
   Widget _buildEmptyState() {
